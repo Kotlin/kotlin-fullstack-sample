@@ -1,0 +1,33 @@
+group = 'org.jetbrains.demo.thinkter'
+version = '0.0.1-SNAPSHOT'
+
+subprojects { p ->
+    p.buildscript {
+        ext.kotlin_version = "1.1.0-dev-5310"
+
+        repositories {
+            mavenLocal()
+            mavenCentral()
+            jcenter()
+            maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+        }
+        
+        dependencies {
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+            classpath "org.jetbrains.kotlin:kotlin-frontend:0.0.1-SNAPSHOT"
+        }
+    }
+}
+
+subprojects {
+    ext.kotlin_version = "1.1.0-dev-5310"
+    ext.html_version = "bootstrap-1.1.0-dev-5173-8"
+    ext.ktor_version = "0.2.5-SNAPSHOT"
+    ext.squash_version = "0.2.2-SNAPSHOT"
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+    }
+}

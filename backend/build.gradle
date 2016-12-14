@@ -1,0 +1,40 @@
+group = 'org.jetbrains.demo.thinkter'
+version = '0.0.1-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.kotlin.frontend'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    compile "org.jetbrains.ktor:ktor-locations:$ktor_version"
+    compile "org.jetbrains.ktor:ktor-html-builder:$ktor_version"
+    compile "org.ehcache:ehcache:3.0.0.m4"
+
+    compile "org.jetbrains.squash:squash-h2:$squash_version"
+
+    
+    testCompile("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testCompile "org.jetbrains.ktor:ktor-test-host:$ktor_version"
+    testCompile "org.jsoup:jsoup:1.9.1"
+
+    compile "org.jetbrains.ktor:ktor-jetty:$ktor_version"
+}
+
+
+ktor {
+    port = 9090
+    jvmOptions = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5009"]
+}
+
+
+sourceSets {
+    main.java.srcDirs += "src"
+    main.resources.srcDirs += "resources"
+    main.kotlin.srcDirs += "src"
+    test.java.srcDirs += "test"
+    test.kotlin.srcDirs += "test"
+    test.resources.srcDirs += "resources"
+}

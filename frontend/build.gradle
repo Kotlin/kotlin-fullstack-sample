@@ -1,0 +1,52 @@
+group = 'org.jetbrains.elemental'
+version = '0.0.1-SNAPSHOT'
+
+apply plugin: 'org.jetbrains.kotlin.frontend'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-js-library:$kotlin_version"
+    compile("org.jetbrains.kotlinx:kotlinx.html.js:$html_version")
+}
+
+kotlinFrontend {
+    sourceMaps = false
+
+    npm {
+        replaceVersion("kotlinx.html.js", "1.1.0")
+        replaceVersion("kotlinx.html.shared", "1.1.0")
+        replaceVersion("kotlin-js-library", "1.1.0")
+
+        dependency("style-loader")
+        dependency("babel-loader")
+        dependency("babel-core")
+        dependency("react")
+        dependency("react-dom")
+        dependency("react-router")
+        dependency("marked")
+        dependency("jquery")
+        devDependency("karma")
+    }
+
+    webpackBundle {
+        publicPath = "/frontend/"
+        port = 8080
+        proxyUrl = "http://localhost:9090"
+    }
+}
+
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "$project.buildDir.path/js/${project.name}.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.main = "call"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += "src"
+    test.kotlin.srcDirs += "test"
+}
