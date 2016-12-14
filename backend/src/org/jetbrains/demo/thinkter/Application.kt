@@ -13,7 +13,7 @@ import java.io.*
 data class Session(val userId: String)
 
 fun Application.main() {
-    val dir = File("target/db")
+    val dir = File("build/db")
     val database = ThinkterDatabase(/*JDBCConnection.Companion.create(H2Dialect, pool)*/)
     val storage: ThinkterStorage = ThinkterCache(database, File(dir.parentFile, "ehcache"))
 

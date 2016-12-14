@@ -20,14 +20,16 @@ kotlinFrontend {
         replaceVersion("kotlinx.html.shared", "1.1.0")
         replaceVersion("kotlin-js-library", "1.1.0")
 
-        dependency("style-loader")
-        dependency("babel-loader")
-        dependency("babel-core")
         dependency("react")
         dependency("react-dom")
         dependency("react-router")
         dependency("marked")
         dependency("jquery")
+
+        devDependency("css-loader")
+        devDependency("style-loader")
+        devDependency("babel-loader")
+        devDependency("babel-core")
         devDependency("karma")
     }
 
@@ -37,6 +39,26 @@ kotlinFrontend {
         proxyUrl = "http://localhost:9090"
     }
 }
+
+task copyResources(type: Sync) {
+    from sourceSets.main.resources.srcDirs
+    into sourceSets.main.output.resourcesDir
+}
+
+getTasksByName("webpack-bundle", false).each { dependsOn(copyResources) }
+
+/*
+task copyResources {
+    inputs.dir sourceSets.main.resources.srcDirs
+    outputs.dir sourceSets.main.output.resourcesDir
+    doLast {
+        copy {
+            from sourceSets.main.resources.srcDirs
+            into sourceSets.main.output.resourcesDir
+        }
+    }
+}
+*/
 
 compileKotlin2Js {
     kotlinOptions.metaInfo = true
@@ -48,5 +70,8 @@ compileKotlin2Js {
 
 sourceSets {
     main.kotlin.srcDirs += "src"
+    main.resources.srcDirs += "resources"
+    main.output.resourcesDir = "build/js/resources"
     test.kotlin.srcDirs += "test"
+    test.resources.srcDirs += "testResources"
 }

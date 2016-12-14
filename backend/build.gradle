@@ -24,10 +24,12 @@ dependencies {
 }
 
 
+/*
 ktor {
     port = 9090
     jvmOptions = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5009"]
 }
+*/
 
 
 sourceSets {
@@ -36,5 +38,5 @@ sourceSets {
     main.kotlin.srcDirs += "src"
     test.java.srcDirs += "test"
     test.kotlin.srcDirs += "test"
-    test.resources.srcDirs += "resources"
+    test.resources.srcDirs += "testResources"
 }

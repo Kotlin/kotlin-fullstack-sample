@@ -1,17 +1,20 @@
 @file:JsModule("react-router")
+
 package org.jetbrains.react
 
-import org.jetbrains.interop.*
+class IndexProps(val component: ReactComponent<*, *>)
+class RouteProps(val path: String, val component: ReactComponent<*, *>)
+class RouterProps(val history: dynamic)
 
-external class Router : ReactComponent<dynamic, dynamic>(null) {
+external class Router(props: RouterProps) : ReactComponent<RouterProps, dynamic>(props) {
     override fun render(): ReactElement = noImpl
 }
 
-external class Route : ReactComponent<dynamic, dynamic>(null) {
+external class Route(props: RouteProps) : ReactComponent<RouteProps, dynamic>(props) {
     override fun render(): ReactElement = noImpl
 }
 
-external class IndexRoute : ReactComponent<dynamic, dynamic>(null) {
+external class IndexRoute(props: IndexProps) : ReactComponent<IndexProps, dynamic>(props) {
     override fun render(): ReactElement = noImpl
 }
 
@@ -22,27 +25,19 @@ external class Link : ReactComponent<dynamic, dynamic>(null) {
 external val browserHistory: dynamic
 
 fun ReactElementBuilder.routing(body: ReactElementBuilder.() -> Unit) {
-    val props = js { history = browserHistory }
-    insert<Router, dynamic>(props, body)
+    insert<Router, dynamic>(RouterProps(browserHistory), body)
 }
 
 inline fun <reified TComponent : ReactComponent<*, *>>
         ReactElementBuilder.route(route: String, noinline body: ReactElementBuilder.() -> Unit = {}) {
     val componentType = reactClass<TComponent>()
-    val props = js {
-        path = route
-        component = componentType
-    }
-    appendRoute(props, body)
+    appendRoute(RouteProps(route, componentType), body)
 }
 
 inline fun <reified TComponent : ReactComponent<*, *>>
         ReactElementBuilder.index(noinline body: ReactElementBuilder.() -> Unit = {}) {
     val componentType = reactClass<TComponent>()
-    val props = js {
-        component = componentType
-    }
-    appendIndex(props, body)
+    appendIndex(IndexProps(componentType), body)
 }
 
 fun ReactElementBuilder.appendRoute(props: dynamic, body: ReactElementBuilder.() -> Unit) {

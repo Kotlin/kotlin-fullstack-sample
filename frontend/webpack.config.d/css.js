@@ -1,2 +1,7 @@
-config.module.loaders.push({ test: /\.css$/, loader: "style!css" });
+config.module.loaders.push(
+    {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+    }
+);
 

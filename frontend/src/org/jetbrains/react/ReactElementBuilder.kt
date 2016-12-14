@@ -82,14 +82,20 @@ class ReactElementBuilder : TagConsumer<ReactElement> {
             throw IllegalStateException("We haven't entered tag ${tag.tagName} but trying to leave")
         val node = path.removeAt(path.lastIndex)
         val element = React.createElement(node.component, node.props, *node.children)
-        if (path.isNotEmpty())
-            appendChild(element)
-        lastLeaved = element
+        appendElement(element)
+
     }
 
     override fun onTagEvent(tag: Tag, event: String, value: (Event) -> Unit) {
         val node = currentNode()
         node.props[event.toReactEventName()] = value
+    }
+
+    fun appendElement(element: ReactElement) {
+        if (path.isNotEmpty()) {
+            appendChild(element)
+        }
+        lastLeaved = element
     }
 
     fun onComponent(component: dynamic, props: dynamic, body: ReactElementBuilder.() -> Unit = {}) {
@@ -100,10 +106,7 @@ class ReactElementBuilder : TagConsumer<ReactElement> {
         path.removeAt(path.lastIndex)
 
         val element = React.createElement(node.component, node.props, node.children)
-        if (path.isNotEmpty()) {
-            appendChild(element)
-        }
-        lastLeaved = element
+        appendElement(element)
     }
 
     inline fun <reified TComponent : ReactComponent<TProps, *>, TProps>
