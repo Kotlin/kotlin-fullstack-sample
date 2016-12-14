@@ -41,24 +41,12 @@ kotlinFrontend {
 }
 
 task copyResources(type: Sync) {
+    inputs.file(sourceSets.main.resources.srcDirs)
     from sourceSets.main.resources.srcDirs
     into sourceSets.main.output.resourcesDir
 }
 
 getTasksByName("webpack-bundle", false).each { dependsOn(copyResources) }
-
-/*
-task copyResources {
-    inputs.dir sourceSets.main.resources.srcDirs
-    outputs.dir sourceSets.main.output.resourcesDir
-    doLast {
-        copy {
-            from sourceSets.main.resources.srcDirs
-            into sourceSets.main.output.resourcesDir
-        }
-    }
-}
-*/
 
 compileKotlin2Js {
     kotlinOptions.metaInfo = true

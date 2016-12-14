@@ -28,9 +28,20 @@ class Home(props: dynamic) : ReactComponent<dynamic, dynamic>(props) {
 
 }
 
+class ToolbarProps
+class Toolbar(props: ToolbarProps) : ReactComponent<ToolbarProps, dynamic>(props) {
+    override fun render() = element {
+        div {
+            +"Toolbar"
+        }
+    }
+
+}
+
 class Application(props: dynamic) : ReactComponent<dynamic, dynamic>(props) {
     override fun render() = element {
         div {
+            ToolbarProps().by(::Toolbar)
             h1 { +"Thinkster" }
             appendElement(props.children)
         }
