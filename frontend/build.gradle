@@ -12,6 +12,15 @@ dependencies {
     compile("org.jetbrains.kotlinx:kotlinx.html.js:$html_version")
 }
 
+
+sourceSets {
+    main.kotlin.srcDirs += "src"
+    main.resources.srcDirs += "resources"
+    main.output.resourcesDir = "build/js/resources"
+    test.kotlin.srcDirs += "test"
+    test.resources.srcDirs += "testResources"
+}
+
 kotlinFrontend {
     sourceMaps = false
 
@@ -41,7 +50,8 @@ kotlinFrontend {
 }
 
 task copyResources(type: Sync) {
-    inputs.file(sourceSets.main.resources.srcDirs)
+    inputs.dir(sourceSets.main.resources.srcDirs)
+    
     from sourceSets.main.resources.srcDirs
     into sourceSets.main.output.resourcesDir
 }
@@ -54,12 +64,4 @@ compileKotlin2Js {
     kotlinOptions.sourceMap = true
     kotlinOptions.moduleKind = 'commonjs'
     kotlinOptions.main = "call"
-}
-
-sourceSets {
-    main.kotlin.srcDirs += "src"
-    main.resources.srcDirs += "resources"
-    main.output.resourcesDir = "build/js/resources"
-    test.kotlin.srcDirs += "test"
-    test.resources.srcDirs += "testResources"
 }
