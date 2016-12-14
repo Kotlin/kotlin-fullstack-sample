@@ -50,8 +50,6 @@ kotlinFrontend {
 }
 
 task copyResources(type: Sync) {
-    inputs.dir(sourceSets.main.resources.srcDirs)
-    
     from sourceSets.main.resources.srcDirs
     into sourceSets.main.output.resourcesDir
 }
