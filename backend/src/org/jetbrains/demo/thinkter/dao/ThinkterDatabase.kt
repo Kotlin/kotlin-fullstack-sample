@@ -41,7 +41,7 @@ class ThinkterDatabase(val db: DatabaseConnection = H2Connection.create("jdbc:h2
 
     override fun getThought(id: Int) = db.transaction {
         val row = from(Thoughts).where { Thoughts.id eq id }.execute().single()
-        Thought(id, row[Thoughts.user], row[Thoughts.text], row[Thoughts.date], row[Thoughts.replyTo])
+        Thought(id, row[Thoughts.user], row[Thoughts.text], row[Thoughts.date].toString(), row[Thoughts.replyTo])
     }
 
     override fun userThoughts(userId: String) = db.transaction {

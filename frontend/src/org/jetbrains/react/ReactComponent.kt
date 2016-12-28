@@ -74,7 +74,15 @@ external abstract class ReactComponent<TProps, TState>(val props: TProps) : Reac
      * @param nextState the object that will be merged with the component's state
      * @param callback an optional callback function that is executed once setState is completed.
      */
-    fun setState(nextState: TState, callback: () -> Unit = {}): Unit = noImpl
+    fun setState(nextState: TState, callback: () -> Unit ): Unit = noImpl
+
+    /**
+     * Merges nextState with the current state.
+     * This is the primary method you use to trigger UI updates from event handlers and server request callbacks.
+     *
+     * @param nextState the object that will be merged with the component's state
+     */
+    fun setState(nextState: TState): Unit = noImpl
 
     /**
      * If your render() method reads from something other than this.props or this.state,
@@ -90,7 +98,7 @@ external abstract class ReactComponent<TProps, TState>(val props: TProps) : Reac
     fun forceUpdate(callback: () -> Unit): Unit = noImpl
 }
 
-open class NativeReactComponent() : ReactComponent<dynamic, dynamic>(null) {
+open external class NativeReactComponent() : ReactComponent<dynamic, dynamic>(null) {
     override fun render(): ReactElement = noImpl
 }
 

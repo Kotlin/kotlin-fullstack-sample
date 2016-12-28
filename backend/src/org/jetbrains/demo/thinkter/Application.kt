@@ -15,7 +15,7 @@ data class Session(val userId: String)
 fun Application.main() {
     val dir = File("build/db")
     val database = ThinkterDatabase(/*JDBCConnection.Companion.create(H2Dialect, pool)*/)
-    val storage: ThinkterStorage = ThinkterCache(database, File(dir.parentFile, "ehcache"))
+    val storage: ThinkterStorage = database /*ThinkterCache(database, File(dir.parentFile, "ehcache"))*/
 
     install(DefaultHeaders)
     install(CallLogging)

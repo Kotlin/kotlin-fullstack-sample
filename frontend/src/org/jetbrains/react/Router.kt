@@ -5,6 +5,7 @@ package org.jetbrains.react
 class IndexProps(val component: ReactComponent<*, *>)
 class RouteProps(val path: String, val component: ReactComponent<*, *>)
 class RouterProps(val history: dynamic)
+class LinkProps(val to: String)
 
 external class Router(props: RouterProps) : ReactComponent<RouterProps, dynamic>(props) {
     override fun render(): ReactElement = noImpl
@@ -18,9 +19,10 @@ external class IndexRoute(props: IndexProps) : ReactComponent<IndexProps, dynami
     override fun render(): ReactElement = noImpl
 }
 
-external class Link : ReactComponent<dynamic, dynamic>(null) {
+external class Link(props: LinkProps) : ReactComponent<LinkProps, dynamic>(props) {
     override fun render(): ReactElement = noImpl
 }
+
 
 external val browserHistory: dynamic
 

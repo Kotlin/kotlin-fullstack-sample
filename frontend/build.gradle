@@ -2,23 +2,17 @@ group = 'org.jetbrains.elemental'
 version = '0.0.1-SNAPSHOT'
 
 apply plugin: 'org.jetbrains.kotlin.frontend'
+apply plugin: 'kotlin-platform-js'
 
 repositories {
     jcenter()
 }
 
 dependencies {
+    implement project(":common")
+
     compile "org.jetbrains.kotlin:kotlin-js-library:$kotlin_version"
     compile("org.jetbrains.kotlinx:kotlinx.html.js:$html_version")
-}
-
-
-sourceSets {
-    main.kotlin.srcDirs += "src"
-    main.resources.srcDirs += "resources"
-    main.output.resourcesDir = "build/js/resources"
-    test.kotlin.srcDirs += "test"
-    test.resources.srcDirs += "testResources"
 }
 
 kotlinFrontend {
@@ -34,6 +28,7 @@ kotlinFrontend {
         dependency("react-router")
         dependency("marked")
         dependency("jquery")
+        dependency("material-ui")
 
         devDependency("css-loader")
         devDependency("style-loader")
@@ -49,17 +44,28 @@ kotlinFrontend {
     }
 }
 
-task copyResources(type: Sync) {
-    from sourceSets.main.resources.srcDirs
-    into sourceSets.main.output.resourcesDir
-}
-
-getTasksByName("webpack-bundle", false).each { dependsOn(copyResources) }
-
 compileKotlin2Js {
     kotlinOptions.metaInfo = true
     kotlinOptions.outputFile = "$project.buildDir.path/js/${project.name}.js"
     kotlinOptions.sourceMap = true
     kotlinOptions.moduleKind = 'commonjs'
     kotlinOptions.main = "call"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += "src"
+    main.resources.srcDirs += "resources"
+    main.output.resourcesDir = "build/js/resources"
+    test.kotlin.srcDirs += "test"
+    test.resources.srcDirs += "testResources"
+}
+
+task copyResources(type: Sync) {
+    from sourceSets.main.resources.srcDirs
+    into sourceSets.main.output.resourcesDir
+}
+
+afterEvaluate {
+    tasks.getByName("webpack-bundle") { dependsOn(copyResources) }
+    tasks.getByName("webpack-run") { dependsOn(copyResources) }
 }

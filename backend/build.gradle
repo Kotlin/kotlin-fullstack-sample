@@ -1,11 +1,12 @@
 group = 'org.jetbrains.demo.thinkter'
 version = '0.0.1-SNAPSHOT'
 
-apply plugin: 'java'
-apply plugin: 'kotlin'
-apply plugin: 'org.jetbrains.kotlin.frontend'
+apply plugin: 'kotlin-platform-jvm'
+//apply plugin: 'org.jetbrains.kotlin.frontend'
 
 dependencies {
+    implement project(":common")
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
@@ -15,7 +16,6 @@ dependencies {
 
     compile "org.jetbrains.squash:squash-h2:$squash_version"
 
-    
     testCompile("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testCompile "org.jetbrains.ktor:ktor-test-host:$ktor_version"
     testCompile "org.jsoup:jsoup:1.9.1"
@@ -24,10 +24,12 @@ dependencies {
 }
 
 
+/*
 ktor {
     port = 9090
     jvmOptions = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5009"]
 }
+*/
 
 
 sourceSets {

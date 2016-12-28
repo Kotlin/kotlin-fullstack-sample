@@ -39,7 +39,7 @@ class ThinkterCache(val delegate: ThinkterStorage, storagePath: File) : Thinkter
 
     override fun createThought(user: String, text: String, replyTo: Int?, date: LocalDateTime): Int {
         val id = delegate.createThought(user, text, replyTo)
-        val thought = Thought(id, user, text, date, replyTo)
+        val thought = Thought(id, user, text, date.toString(), replyTo)
         thoughtsCache.put(id, thought)
         return id
     }

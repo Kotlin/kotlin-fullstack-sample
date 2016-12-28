@@ -119,6 +119,13 @@ class ReactElementBuilder : TagConsumer<ReactElement> {
         onComponent(reactClass<TComponent>(), this)
     }
 
+    operator fun Entities.unaryPlus(): Unit {
+        onTagContentEntity(this)
+    }
+
+    operator fun String.unaryPlus(): Unit {
+        onTagContent(this)
+    }
 }
 
 var TEXTAREA.value: String

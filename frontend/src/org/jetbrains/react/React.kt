@@ -29,3 +29,4 @@ fun Element?.react(body: ReactElementBuilder.() -> Unit) {
     ReactDOM.render(ReactElementBuilder().apply(body).finalize(), this)
 }
 
+inline fun props(builder: dynamic.() -> Unit): dynamic = jsObject(builder)

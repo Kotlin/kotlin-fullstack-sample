@@ -22,6 +22,5 @@ fun Any.toPlainObject(): dynamic {
 }
 
 inline fun <T> jsObject(builder: T.() -> Unit): T = (js("({})") as T).apply(builder)
-inline fun js(builder: dynamic.() -> Unit): dynamic = jsObject(builder)
 
 external fun require(module: String)
