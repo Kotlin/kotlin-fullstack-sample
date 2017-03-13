@@ -24,7 +24,7 @@ subprojects {
     ext.kotlin_version = "1.1.0"
     ext.html_version = "0.6.2"
     ext.ktor_version = "0.3.0"
-    ext.squash_version = "0.2.2-SNAPSHOT"
+    ext.squash_version = "0.2.2"
 
     repositories {
         mavenCentral()
