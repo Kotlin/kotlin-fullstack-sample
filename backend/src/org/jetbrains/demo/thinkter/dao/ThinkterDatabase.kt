@@ -1,6 +1,5 @@
 package org.jetbrains.demo.thinkter.dao
 
-import org.jetbrains.demo.thinkter.model.*
 import org.jetbrains.squash.connection.*
 import org.jetbrains.squash.dialects.h2.*
 import org.jetbrains.squash.expressions.*

@@ -1,26 +1,25 @@
 group = 'org.jetbrains.elemental'
 version = '0.0.1-SNAPSHOT'
 
+apply plugin: 'kotlin2js'
 apply plugin: 'org.jetbrains.kotlin.frontend'
-apply plugin: 'kotlin-platform-js'
 
 repositories {
     jcenter()
 }
 
 dependencies {
-    implement project(":common")
-
-    compile "org.jetbrains.kotlin:kotlin-js-library:$kotlin_version"
-    compile("org.jetbrains.kotlinx:kotlinx.html.js:$html_version")
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
+    compile("org.jetbrains.kotlinx:kotlinx-html-js:$html_version")
 }
 
 kotlinFrontend {
     sourceMaps = false
 
     npm {
-        replaceVersion("kotlinx.html.js", "1.1.0")
-        replaceVersion("kotlinx.html.shared", "1.1.0")
+        replaceVersion("kotlinx-html-js", "1.1.0")
+        replaceVersion("kotlinx-html-shared", "1.1.0")
         replaceVersion("kotlin-js-library", "1.1.0")
 
         dependency("react")
@@ -28,7 +27,6 @@ kotlinFrontend {
         dependency("react-router")
         dependency("marked")
         dependency("jquery")
-        dependency("material-ui")
 
         devDependency("css-loader")
         devDependency("style-loader")

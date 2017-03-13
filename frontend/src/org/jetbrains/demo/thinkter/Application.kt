@@ -1,27 +1,22 @@
 package org.jetbrains.demo.thinkter
 
 import kotlinx.html.*
-import org.jetbrains.components.*
-import org.jetbrains.interop.*
-import org.jetbrains.react.*
+import react.*
+import react.dom.*
 import kotlin.browser.*
 
 fun main(args: Array<String>) {
-    require("./resources/main.css");
-
-    document.getElementById("content").react {
+    ReactDOM.render(document.getElementById("content")) {
         div {
-            routing {
-                route<Application>("/") {
-                    index<Home>()
-                }
-            }
+            Application {}
         }
     }
 }
 
-class Home(props: dynamic) : ReactComponent<dynamic, dynamic>(props) {
-    override fun render() = element {
+class Home : ReactDOMComponent<ReactComponentNoProps, ReactComponentNoState>() {
+    companion object : ReactComponentSpec<Home, ReactComponentNoProps, ReactComponentNoState>
+
+    override fun ReactDOMBuilder.render() {
         div {
             h1 { +"Thoughts" }
             +"… list of thought …"
@@ -30,52 +25,12 @@ class Home(props: dynamic) : ReactComponent<dynamic, dynamic>(props) {
 
 }
 
-class ToolbarProps
-class Toolbar(props: ToolbarProps) : ReactComponent<ToolbarProps, dynamic>(props) {
-    override fun render() = element {
-        nav("toolbar horizontal fixed-top") {
-            div("content") {
-                div("content-start") {
-                    div("item") {
-                        LinkProps("/").by(::Link) { +"Home" }
-                    }
-                }
-                div("content-end") {
-                    div("item") {
-                        LinkProps("/profile").by(::Link) { +"Profile" }
-                    }
-                }
-                div("item") {
-                    LinkProps("/thoughts").by(::Link) { +"Thoughts" }
-                }
-            }
-        }
-    }
+class Application : ReactDOMComponent<ReactComponentNoProps, ReactComponentNoState>() {
+    companion object : ReactComponentSpec<Application, ReactComponentNoProps, ReactComponentNoState>
 
-}
-
-val themeSettings = getMuiTheme(props {
-    palette = props {
-        accent1Color = deepOrange500
-    }
-})
-
-class Application(props: dynamic) : ReactComponent<dynamic, dynamic>(props) {
-    override fun render() = element {
+    override fun ReactDOMBuilder.render() {
         div {
-            onComponent(MuiThemeProvider, props {
-                this.muiTheme = themeSettings
-            }) {
-                div() {
-                    appbar("Thinkter") {
-                        iconButton {
-                            fontIcon("material-icons") { +"home" }
-                        }
-                    }
-
-                    appendElement(props.children)
-                }
-            }
+            Home {}
         }
     }
 }

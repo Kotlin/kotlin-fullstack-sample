@@ -1,12 +1,9 @@
 group = 'org.jetbrains.demo.thinkter'
 version = '0.0.1-SNAPSHOT'
 
-apply plugin: 'kotlin-platform-jvm'
-//apply plugin: 'org.jetbrains.kotlin.frontend'
+apply plugin: 'kotlin'
 
 dependencies {
-    implement project(":common")
-
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
@@ -23,15 +20,6 @@ dependencies {
     compile "org.jetbrains.ktor:ktor-jetty:$ktor_version"
 }
 
-
-/*
-ktor {
-    port = 9090
-    jvmOptions = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5009"]
-}
-*/
-
-
 sourceSets {
     main.java.srcDirs += "src"
     main.resources.srcDirs += "resources"
@@ -39,4 +27,14 @@ sourceSets {
     test.java.srcDirs += "test"
     test.kotlin.srcDirs += "test"
     test.resources.srcDirs += "testResources"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

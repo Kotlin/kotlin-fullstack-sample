@@ -1,32 +1,20 @@
-package org.jetbrains.react
+package react
 
-import org.jetbrains.interop.*
-import org.w3c.dom.*
+import runtime.wrappers.*
 
-@JsModule("react")
-external object React {
-    fun createElement(type: (Any?) -> ReactElement, prop: Any?, vararg children: dynamic): ReactElement
-    fun createElement(type: dynamic, prop: Any?, vararg children: dynamic): ReactElement
+interface ReactElement
+
+object React {
+
+    private val raw: ReactSpec = require("react")
+
+    fun normalize(child: Any?) : List<Any> = when(child) {
+        null -> listOf()
+        is Iterable<*> -> child.filterNotNull()
+        is Array<*> -> child.filterNotNull()
+        else -> listOf(child)
+    }
+
+    fun createRaw(type: Any, props: dynamic, child: Any? = null): ReactElement =
+       raw.createElement(type, toPlainObjectStripNull(props), *normalize(child).toTypedArray())
 }
-
-inline fun <reified TComponent : ReactComponent<TProps, *>, TProps>
-        ReactElementBuilder.insert(props: TProps, noinline body: ReactElementBuilder.() -> Unit = {}) {
-    onComponent(reactClass<TComponent>(), props, body)
-}
-
-
-inline fun <reified TComponent : ReactComponent<*, *>> reactClass(): dynamic {
-    val componentType: dynamic = TComponent::class.js
-    val displayName = nameOf<TComponent>()
-    if (displayName != null)
-        componentType.displayName = displayName
-    return componentType
-}
-
-fun Element?.react(body: ReactElementBuilder.() -> Unit) {
-    if (this == null)
-        throw IllegalArgumentException("DOM Element is null")
-    ReactDOM.render(ReactElementBuilder().apply(body).finalize(), this)
-}
-
-inline fun props(builder: dynamic.() -> Unit): dynamic = jsObject(builder)

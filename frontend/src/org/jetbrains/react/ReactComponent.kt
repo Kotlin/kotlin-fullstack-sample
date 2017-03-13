@@ -1,109 +1,213 @@
-@file:JsModule("react")
+package react
 
-package org.jetbrains.react
+import runtime.reactive.*
+import runtime.reflect.*
+import kotlin.reflect.*
 
-import org.w3c.dom.*
+abstract class RProps {
+    var key: String? = null
+    var children: Any? = null
+}
 
-@JsName("ComponentLifecycle")
-external interface ReactComponentLifecycle<in TProps, in TState> {
-    fun componentWillMount() {
+external interface RState
+
+class BoxedState<T>(var state: T) : RState
+
+interface ReactComponentSpec<T : ReactComponent<P, S>, P : RProps, S : RState>
+
+
+private var initWrapper: ReactComponentWrapper<*, *, *>? = null
+
+abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
+
+    internal val wrapper = initWrapper as ReactComponentWrapper<*, *, S>
+    internal var stateField: Maybe<S> = Maybe.None
+    internal var isSealed = false
+    val props: P
+        get() = wrapper.props.asDynamic()
+
+    var state: S
+        get() = stateField.orElseThrow()
+        set(value) {
+            if (!isSealed) {
+                stateField = Maybe.Just(value)
+            } else {
+                throw RuntimeException("You can't set initial state not in constructor")
+            }
+        }
+
+    fun setState(builder: S.() -> Unit) {
+        if (!isSealed) {
+            state.builder()
+        } else {
+            wrapper.setState(builder)
+        }
     }
 
-    fun componentDidMount() {
+    fun replaceState(state: S) {
+        if (!isSealed) {
+            this.state = state
+        } else {
+            wrapper.replaceState(state)
+        }
     }
 
+    internal fun seal() {
+        isSealed = true
+    }
+
+    internal fun setStateFromWrapper(state: S) {
+        stateField = Maybe.Just(state)
+    }
+
+    companion object {
+
+        private val wrappers = HashMap<Any, Any>()
+
+        inline fun <reified K, P : RProps, S : RState> wrap(): (P, Any, ReactUpdater) -> ReactComponentWrapper<K, P, S>  where K : ReactComponent<P, S> {
+            return wrap(K::class)
+        }
+
+        fun <K, P : RProps, S : RState> wrap(clazz: KClass<K>): (P, Any, ReactUpdater) -> ReactComponentWrapper<K, P, S>  where K : ReactComponent<P, S> {
+            if (wrappers[clazz] == null) {
+                wrappers[clazz] = { p: P, context: Any, updater: ReactUpdater -> ReactComponentWrapper(p, updater, clazz) }
+                wrappers[clazz].asDynamic().displayName = clazz.js.name
+            }
+            return wrappers[clazz] as (P, Any, ReactUpdater) -> ReactComponentWrapper<K, P, S>
+        }
+    }
+
+    abstract fun render(): ReactElement?
+
+    open fun componentWillMount() {
+
+    }
+
+    open fun componentDidMount() {
+
+    }
+
+    open fun componentWillUnmount() {
+
+    }
+
+    open fun componentDidUpdate(prevProps: P, prevState: S) {
+
+    }
+
+    open fun shouldComponentUpdate(nextProps: P, nextState: S): Boolean {
+        return true
+    }
+
+    open fun componentWillUpdate() {
+
+    }
+
+    open fun componentWillReceiveProps(nextProps: P) {
+
+    }
+
+    override fun subscribe(listener: ReactComponentLifecycleListener) {
+        wrapper.subscribers.add(listener)
+    }
+
+    override fun unsubsctibe(listener: ReactComponentLifecycleListener) {
+        wrapper.subscribers.remove(listener)
+    }
+}
+
+//
+// Wrapper Class
+// Passed directly to React and proxifies all method calls to a real one
+// Created for not mixing react and kotlin (overridable) functions and for having ability
+// to alter our component's behaviour with powerfull kotlin black magic
+//
+
+class ReactComponentWrapper<K, P : RProps, S : RState>(var props: P, val updater: ReactUpdater, val klazz: KClass<K>) where K : ReactComponent<P, S> {
+
+    private val delegate: K
+    private var stateField: Maybe<S> = Maybe.None
+    var state: S
+        get() = stateField.orElseThrow()
+        set(value) {
+            stateField = Maybe.Just(value)
+            delegate.setStateFromWrapper(value)
+        }
+    var subscribers = ArrayList<ReactComponentLifecycleListener>()
+
+    init {
+        val oldGlobal = initWrapper
+        initWrapper = this
+        delegate = klazz.createInstance()
+        delegate.seal()
+        initWrapper = oldGlobal
+
+        if (!delegate.stateField.hasValue) {
+            throw RuntimeException("You haven't set initial state in your constructor!")
+        }
+        this.stateField = Maybe.Just(delegate.state)
+    }
+
+    fun setState(stateBuilder: S.() -> Unit) {
+        val partialState: S = js("({})")
+        partialState.stateBuilder()
+
+        updater.enqueueSetState(this, partialState)
+    }
+
+    fun replaceState(state: S) {
+        updater.enqueueReplaceState(this, state)
+    }
+
+    @JsName("render")
+    fun render(): ReactElement? {
+        return delegate.render()
+    }
+
+    @JsName("shouldComponentUpdate")
+    fun shouldComponentUpdate(nextProps: P, nextState: S): Boolean {
+        return delegate.shouldComponentUpdate(nextProps, nextState)
+    }
+
+    @JsName("componentWillReceiveProps")
+    fun componentWillReceiveProps(nextProps: P) {
+        delegate.componentWillReceiveProps(nextProps)
+    }
+
+    @JsName("componentWillUpdate")
+    fun componentWillUpdate() {
+        subscribers.forEach {
+            it.reactComponentWillUpdate()
+        }
+        delegate.componentWillUpdate()
+    }
+
+    @JsName("componentDidUpdate")
+    fun componentDidUpdate(prevProps: P, prevState: S) {
+        delegate.componentDidUpdate(prevProps, prevState)
+    }
+
+    @JsName("componentWillUnmount")
     fun componentWillUnmount() {
+        subscribers.forEach {
+            it.reactComponentWillUnmount()
+        }
+        delegate.componentWillUnmount()
     }
 
-    fun componentWillReceiveProps(nextProps: TProps, nextContext: Any) {
+    @JsName("componentWillMount")
+    fun componentWillMount() {
+        subscribers.forEach {
+            it.reactComponentWillMount()
+        }
+        delegate.componentWillMount()
     }
 
-    fun shouldComponentUpdate(nextProps: TProps, nextState: TState, nextContext: Any): Boolean = true
-    fun componentWillUpdate(nextProps: TProps, nextState: TState, nextContext: Any) {
+    @JsName("componentDidMount")
+    fun componentDidMount() {
+        subscribers.forEach {
+            it.reactComponentDidMount()
+        }
+        delegate.componentDidMount()
     }
-
-    fun componentDidUpdate(prevProps: TProps, prevState: TState, prevContext: Any) {
-    }
-}
-
-
-@JsName("Component")
-external abstract class ReactComponent<TProps, TState>(val props: TProps) : ReactComponentLifecycle<TProps, TState> {
-    val refs: dynamic get() = noImpl
-
-    var state: TState = noImpl;
-
-    abstract fun render(): ReactElement
-
-    /**
-     * If this component has been mounted into the DOM, this returns the corresponding native browser DOM element.
-     * This method is useful for reading values out of the DOM, such as form field values and performing DOM measurements.
-     */
-    fun getDOMNode(): Element = noImpl
-
-    /**
-     * When you're integrating with an external JavaScript application you may want to signal a change to a React component rendered with renderComponent().
-     * Simply call setProps() to change its properties and trigger a re-render.
-     *
-     * @param nextProps the object that will be merged with the component's props
-     * @param callback an optional callback function that is executed once setProps is completed.
-     */
-    fun setProps(nextProps: TProps, callback: (() -> Unit)?): Unit = noImpl
-
-    /**
-     * Like setProps() but deletes any pre-existing props instead of merging the two objects.
-     *
-     * @param nextProps the object that will replace the component's props
-     * @param callback an optional callback function that is executed once replaceProps is completed.
-     */
-    fun replaceProps(nextProps: TProps, callback: () -> Unit): Unit = noImpl
-
-    /**
-     * Transfer properties from this component to a target component that have not already been set on the target component.
-     * After the props are updated, targetComponent is returned as a convenience.
-     *
-     * @param target the component that will receive the props
-     */
-    fun <C : ReactComponent<TProps, Any>> transferPropsTo(target: C): C = noImpl
-
-    /**
-     * Merges nextState with the current state.
-     * This is the primary method you use to trigger UI updates from event handlers and server request callbacks.
-     * In addition, you can supply an optional callback function that is executed once setState is completed.
-     *
-     * @param nextState the object that will be merged with the component's state
-     * @param callback an optional callback function that is executed once setState is completed.
-     */
-    fun setState(nextState: TState, callback: () -> Unit ): Unit = noImpl
-
-    /**
-     * Merges nextState with the current state.
-     * This is the primary method you use to trigger UI updates from event handlers and server request callbacks.
-     *
-     * @param nextState the object that will be merged with the component's state
-     */
-    fun setState(nextState: TState): Unit = noImpl
-
-    /**
-     * If your render() method reads from something other than this.props or this.state,
-     * you'll need to tell React when it needs to re-run render() by calling forceUpdate().
-     * You'll also need to call forceUpdate() if you mutate this.state directly.
-     * Calling forceUpdate() will cause render() to be called on the component and its children,
-     * but React will still only update the DOM if the markup changes.
-     * Normally you should try to avoid all uses of forceUpdate() and only read from this.props and this.state in render().
-     * This makes your application much simpler and more efficient.
-     *
-     * @param callback an optional callback that is executed once forceUpdate is completed.
-     */
-    fun forceUpdate(callback: () -> Unit): Unit = noImpl
-}
-
-open external class NativeReactComponent() : ReactComponent<dynamic, dynamic>(null) {
-    override fun render(): ReactElement = noImpl
-}
-
-fun <TProps, TState> ReactComponent<TProps, TState>.setState(block: dynamic.() -> Unit): Unit {
-    val obj = js("({})")
-    obj.block()
-    setState(obj as TState)
 }

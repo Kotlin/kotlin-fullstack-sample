@@ -1,7 +1,6 @@
 package org.jetbrains.demo.thinkter
 
 import org.jetbrains.demo.thinkter.dao.*
-import org.jetbrains.demo.thinkter.model.*
 import org.jetbrains.ktor.application.*
 import org.jetbrains.ktor.locations.*
 import org.jetbrains.ktor.routing.*

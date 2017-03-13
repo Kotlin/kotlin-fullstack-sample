@@ -1,6 +1,6 @@
 package org.jetbrains.demo.thinkter
 
-import org.jetbrains.demo.thinkter.model.*
+import org.jetbrains.demo.thinkter.dao.*
 import org.jetbrains.ktor.application.*
 import org.jetbrains.ktor.http.*
 import org.jetbrains.ktor.locations.*
@@ -22,7 +22,7 @@ fun hash(password: String): String {
 
 fun ApplicationCall.refererHost() = request.header(HttpHeaders.Referrer)?.let { URI.create(it).host }
 
-fun ApplicationCall.redirect(location: Any): Nothing {
+suspend fun ApplicationCall.redirect(location: Any) {
     val host = request.host() ?: "localhost"
     val portSpec = request.port().let { if (it == 80) "" else ":$it" }
     val address = host + portSpec
