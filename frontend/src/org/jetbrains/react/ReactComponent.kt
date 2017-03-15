@@ -120,7 +120,7 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 // Wrapper Class
 // Passed directly to React and proxifies all method calls to a real one
 // Created for not mixing react and kotlin (overridable) functions and for having ability
-// to alter our component's behaviour with powerfull kotlin black magic
+// to alter our component's behaviour with powerful kotlin black magic
 //
 
 class ReactComponentWrapper<K, P : RProps, S : RState>(var props: P, val updater: ReactUpdater, val klazz: KClass<K>) where K : ReactComponent<P, S> {
@@ -143,7 +143,7 @@ class ReactComponentWrapper<K, P : RProps, S : RState>(var props: P, val updater
         initWrapper = oldGlobal
 
         if (!delegate.stateField.hasValue) {
-            throw RuntimeException("You haven't set initial state in your constructor!")
+            throw RuntimeException("You haven't set initial state in your constructor of ${klazz.simpleName}!")
         }
         this.stateField = Maybe.Just(delegate.state)
     }

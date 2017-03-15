@@ -114,6 +114,7 @@ fun property(subj: dynamic, name: String): Any? = js("subj[name]")
 external interface PropertyDescriptor {
 }
 
+// https://youtrack.jetbrains.com/issue/KT-16811
 external val Object: ObjectConstructor
 
 external interface ObjectConstructor {
@@ -159,7 +160,7 @@ external interface KMetadata {
     val kind: String
     val simpleName: String
     val interfaces: Array<Any>
-};
+}
 
 fun jsstyle(builder: dynamic.() -> Unit): String = js(builder)
 

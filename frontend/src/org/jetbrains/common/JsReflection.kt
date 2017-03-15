@@ -4,12 +4,17 @@ import runtime.wrappers.*
 import kotlin.reflect.*
 
 fun <T : Any> KClass<T>.createInstance(): T {
+    @Suppress("UNUSED_VARIABLE")
     val ctor = this.js
+
     return js("new ctor()")
 }
 
 fun <T : Any> KClass<T>.createInstance(arg: Any): T {
+    @Suppress("UNUSED_VARIABLE")
     val ctor = this.js
+
+    @Suppress("UNUSED_VARIABLE")
     val arg1 = arg
     return js("new ctor(arg1)")
 }
@@ -53,7 +58,7 @@ object JsReflection {
     }
 
     internal fun getClassMetadata(clazz: KClass<*>): JsClassMetadata {
-        return classMetadata[clazz] ?: throw RuntimeException("This class is not enriched. Did you call enrichReflection on required module?")
+        return classMetadata[clazz] ?: throw RuntimeException("Class ${clazz.simpleName} is not enriched. Did you call enrichReflection on required module?")
     }
 
     internal fun findSubclasses(base: KClass<*>): Array<KClass<*>> {
@@ -70,7 +75,7 @@ object JsReflection {
 
             val propName = it
             // indexed properties
-            if (propName.all { it >= '0' && it <= '9' })
+            if (propName.all { it in '0'..'9' })
                 return@forEach
             // closure functions
             if (propName.contains('$'))
@@ -87,6 +92,7 @@ object JsReflection {
                 if (propValue != null) {
                     if (propValue[KotlinCompiler.metadata] != null) {
                         // Kotlin Class
+                        @Suppress("UNCHECKED_CAST_TO_NATIVE_INTERFACE")
                         res.add(JsClassMetadata((propValue as JsClass<*>).kotlin, module, pkg, propValue[KotlinCompiler.metadata]))
                     } else {
                         // Otherwise this is a new package
