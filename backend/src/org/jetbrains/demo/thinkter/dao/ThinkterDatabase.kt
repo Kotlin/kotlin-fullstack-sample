@@ -1,5 +1,6 @@
 package org.jetbrains.demo.thinkter.dao
 
+import org.jetbrains.demo.thinkter.model.*
 import org.jetbrains.squash.connection.*
 import org.jetbrains.squash.dialects.h2.*
 import org.jetbrains.squash.expressions.*
@@ -10,7 +11,7 @@ import org.jetbrains.squash.statements.*
 import java.io.*
 import java.time.*
 
-class ThinkterDatabase(val db: DatabaseConnection = H2Connection.create("jdbc:h2:mem:test")) : ThinkterStorage {
+class ThinkterDatabase(val db: DatabaseConnection = H2Connection.createMemoryConnection()) : ThinkterStorage {
     constructor(dir: File) : this(H2Connection.create("jdbc:h2:file:${dir.canonicalFile.absolutePath}"))
 
     init {

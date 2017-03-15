@@ -16,7 +16,11 @@ data class ThoughtDelete(val id: Int, val date: Long, val code: String)
 data class ViewThought(val id: Int)
 
 @location("/user/{user}")
+@Deprecated("")
 data class UserPage(val user: String)
+
+@location("/user/{user}/thoughts")
+data class UserThoughts(val user: String)
 
 @location("/register")
 data class Register(val userId: String = "", val displayName: String = "", val email: String = "", val password: String = "", val error: String = "")

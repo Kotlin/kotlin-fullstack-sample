@@ -4,6 +4,7 @@ import org.ehcache.*
 import org.ehcache.config.*
 import org.ehcache.config.persistence.*
 import org.ehcache.config.units.*
+import org.jetbrains.demo.thinkter.model.*
 import java.io.*
 import java.time.*
 

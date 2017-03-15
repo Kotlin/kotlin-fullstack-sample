@@ -20,6 +20,10 @@ class ApplicationPage : Template<HTML> {
             }
             insert(head)
             link("https://fonts.googleapis.com/icon?family=Material+Icons", rel = "stylesheet")
+
+            link(rel = LinkRel.stylesheet, type=LinkType.textCss, href = "http://yui.yahooapis.com/pure/0.6.0/pure-min.css")
+            link(rel = LinkRel.stylesheet, type=LinkType.textCss, href = "http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css")
+
         }
         body {
             script {
