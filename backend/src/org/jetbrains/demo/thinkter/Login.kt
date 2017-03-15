@@ -1,21 +1,16 @@
 package org.jetbrains.demo.thinkter
 
 import org.jetbrains.demo.thinkter.dao.*
+import org.jetbrains.demo.thinkter.model.*
 import org.jetbrains.ktor.application.*
+import org.jetbrains.ktor.http.*
 import org.jetbrains.ktor.locations.*
 import org.jetbrains.ktor.routing.*
 import org.jetbrains.ktor.sessions.*
 
 fun Route.login(dao: ThinkterStorage, hash: (String) -> String) {
     get<Login> {
-        val user = call.sessionOrNull<Session>()?.let { dao.user(it.userId) }
-
-        if (user != null) {
-            call.redirect(UserPage(user.userId))
-        } else {
-            TODO()
-            //call.respond(FreeMarkerContent("login.ftl", mapOf("userId" to it.userId, "error" to it.error), ""))
-        }
+        call.respond(HttpStatusCode.MethodNotAllowed)
     }
     post<Login> {
         val login = when {
@@ -26,14 +21,14 @@ fun Route.login(dao: ThinkterStorage, hash: (String) -> String) {
         }
 
         if (login == null) {
-            call.redirect(it.copy(password = "", error = "Invalid username or password"))
+            call.respond(LoginResponse(error = "Invalid username or password"))
         } else {
             call.session(Session(login.userId))
-            call.redirect(UserPage(login.userId))
+            call.respond(LoginResponse(login))
         }
     }
-    get<Logout> {
+    post<Logout> {
         call.clearSession()
-        call.redirect(Index())
+        call.respond(HttpStatusCode.OK)
     }
 }

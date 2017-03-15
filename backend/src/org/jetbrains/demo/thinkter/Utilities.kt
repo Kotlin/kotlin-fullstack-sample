@@ -1,6 +1,7 @@
 package org.jetbrains.demo.thinkter
 
 import org.jetbrains.demo.thinkter.dao.*
+import org.jetbrains.demo.thinkter.model.*
 import org.jetbrains.ktor.application.*
 import org.jetbrains.ktor.http.*
 import org.jetbrains.ktor.locations.*
@@ -38,5 +39,5 @@ fun ApplicationCall.verifyCode(date: Long, user: User, code: String, hashFunctio
                 && (System.currentTimeMillis() - date).let { it > 0 && it < TimeUnit.MILLISECONDS.convert(2, TimeUnit.HOURS) }
 
 
-private val userIdPattern = "[a-zA-Z0-9_\\.]+".toRegex()
+private val userIdPattern = "[a-zA-Z0-9_.]+".toRegex()
 internal fun userNameValid(userId: String) = userId.matches(userIdPattern)
