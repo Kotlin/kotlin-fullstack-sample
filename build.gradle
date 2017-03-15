@@ -7,15 +7,13 @@ subprojects { p ->
 
         repositories {
             mavenLocal()
-            mavenCentral()
             jcenter()
-            maven { url "http://dl.bintray.com/kotlin/kotlinx.html" }
-            maven { url "http://dl.bintray.com/kotlin/ktor" }
+            maven { url "https://jitpack.io" }
         }
         
         dependencies {
             classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-            classpath "org.jetbrains.kotlin:kotlin-frontend:0.0.1-SNAPSHOT"
+            classpath "com.github.Kotlin:kotlin-frontend-plugin:568610baa1"
         }
     }
 }
@@ -27,9 +25,10 @@ subprojects {
     ext.squash_version = "0.2.2"
 
     repositories {
-        mavenCentral()
         mavenLocal()
+        jcenter()
         maven { url "http://dl.bintray.com/kotlin/kotlinx.html" }
         maven { url "http://dl.bintray.com/kotlin/ktor" }
+        maven { url "https://dl.bintray.com/kotlin/squash" }
     }
 }
