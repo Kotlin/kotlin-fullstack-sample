@@ -60,7 +60,8 @@ sourceSets {
 
 task copyResources(type: Sync) {
     from sourceSets.main.resources.srcDirs
-    into sourceSets.main.output.resourcesDir
+//    into sourceSets.main.output.resourcesDir
+    into file(buildDir.path + "/js")
 }
 
 afterEvaluate {

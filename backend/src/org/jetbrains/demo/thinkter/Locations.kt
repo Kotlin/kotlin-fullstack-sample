@@ -7,7 +7,7 @@ import org.jetbrains.ktor.locations.*
 class Index()
 
 @location("/post-new")
-data class PostThought(val text: String = "", val date: Long = 0L, val code: String = "")
+data class PostThought(val text: String = "", val date: Long = 0L, val code: String = "", val replyTo: Int? = null)
 
 @location("/thought/{id}/delete")
 data class ThoughtDelete(val id: Int, val date: Long, val code: String)
