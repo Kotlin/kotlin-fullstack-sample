@@ -69,6 +69,7 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
                         thought = state.currentThought ?: Thought(0, "?", "?", "?", null)
                         currentUser = state.currentUser
                         reply = { onReplyTo(it) }
+                        leave = { mainViewSelected() }
                     }
                 }
             }

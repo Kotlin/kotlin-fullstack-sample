@@ -5,6 +5,8 @@ import kotlinx.html.js.*
 import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
+import runtime.wrappers.*
+import kotlin.browser.*
 
 class ViewThoughtComponent : ReactDOMComponent<ViewThoughtComponent.Props, ReactComponentNoState>() {
 
@@ -39,6 +41,19 @@ class ViewThoughtComponent : ReactDOMComponent<ViewThoughtComponent.Props, React
                 }
                 div(classes = "pure-u-3 pure-u-md-1-3") {
                     a(href = "javascript:void(0)") {
+                        +"Delete"
+
+                        onClickFunction = {
+                            delete()
+                        }
+                    }
+
+                    span {
+                        style = jsstyle { margin = "0 5px 0 5px" }
+                        +" "
+                    }
+
+                    a(href = "javascript:void(0)") {
                         +"Reply"
 
                         onClickFunction = {
@@ -50,5 +65,15 @@ class ViewThoughtComponent : ReactDOMComponent<ViewThoughtComponent.Props, React
         }
     }
 
-    class Props(var thought: Thought, var currentUser: User? = null, var reply: (Thought) -> Unit = {}) : RProps()
+    private fun delete() {
+        if (window.confirm("Do you want to delete the thought?")) {
+            postThoughtPrepare().then({ token ->
+                deleteThought(props.thought.id, token.date, token.code).then(
+                        { props.leave() }
+                )
+            })
+        }
+    }
+
+    class Props(var thought: Thought, var currentUser: User? = null, var reply: (Thought) -> Unit = {}, var leave: () -> Unit = {}) : RProps()
 }
