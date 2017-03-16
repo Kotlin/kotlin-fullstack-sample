@@ -56,10 +56,13 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
                     }
                     MainView.PostThought -> NewThoughComponent {
                         showThought = { t -> onShowThought(t) }
+                        replyTo = state.replyTo
                     }
                     MainView.User -> {}
                     MainView.Though -> ViewThoughtComponent {
                         thought = state.currentThought ?: Thought(0, "?", "?", "?", null)
+                        currentUser = state.currentUser
+                        reply = { onReplyTo(it) }
                     }
                 }
             }
@@ -67,6 +70,13 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
             div("footer") {
                 +"Thinkter kotlin frontend + react + ktor example"
             }
+        }
+    }
+
+    private fun onReplyTo(t: Thought) {
+        setState {
+            replyTo = t
+            selected = MainView.PostThought
         }
     }
 
@@ -118,7 +128,7 @@ enum class MainView {
     Home
 }
 
-class ApplicationPageState(var selected: MainView, var currentUser: User? = null, var currentThought: Thought? = null) : RState
+class ApplicationPageState(var selected: MainView, var currentUser: User? = null, var currentThought: Thought? = null, var replyTo: Thought? = null) : RState
 class UserProps : RProps() {
     var userAssigned: (User) -> Unit = {}
 }

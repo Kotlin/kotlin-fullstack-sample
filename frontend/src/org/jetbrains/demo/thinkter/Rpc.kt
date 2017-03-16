@@ -35,6 +35,9 @@ fun postThought(replyTo: Int?, text: String, token: PostThoughtToken): Promise<T
         append("text", text)
         append("date", token.date.toString())
         append("code", token.code)
+        if (replyTo != null) {
+            append("replyTo", replyTo.toString())
+        }
     }, ::parsePostThoughtResponse)
 }
 

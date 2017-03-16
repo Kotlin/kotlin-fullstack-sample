@@ -25,7 +25,7 @@ fun Route.postThought(dao: ThinkterStorage, hashFunction: (String) -> String) {
         if (user == null || !call.verifyCode(it.date, user, it.code, hashFunction)) {
             call.respond(HttpStatusCode.Forbidden)
         } else {
-            val id = dao.createThought(user.userId, it.text, null)
+            val id = dao.createThought(user.userId, it.text, it.replyTo)
             call.respond(PostThoughtResult(dao.getThought(id)))
         }
     }

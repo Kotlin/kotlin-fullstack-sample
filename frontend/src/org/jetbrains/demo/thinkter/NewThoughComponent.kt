@@ -57,7 +57,7 @@ class NewThoughComponent : ReactDOMComponent<NewThoughComponent.Props, NewThough
 
     private fun doPostThought() {
         postThoughtPrepare().then({ t ->
-            postThought(null, state.text, t).then({ thought ->
+            postThought(props.replyTo?.id, state.text, t).then({ thought ->
                 onSubmitted(thought)
             }, { onFailed(it) }).catch { onFailed(it) }
         }, { onFailed(it) }).catch { onFailed(it) }
