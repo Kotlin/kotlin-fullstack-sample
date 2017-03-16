@@ -10,7 +10,12 @@ import org.jetbrains.ktor.sessions.*
 
 fun Route.login(dao: ThinkterStorage, hash: (String) -> String) {
     get<Login> {
-        call.respond(HttpStatusCode.MethodNotAllowed)
+        val user = call.sessionOrNull<Session>()?.let { dao.user(it.userId) }
+        if (user == null) {
+            call.respond(HttpStatusCode.Forbidden)
+        } else {
+            call.respond(LoginResponse(user))
+        }
     }
     post<Login> {
         val login = when {

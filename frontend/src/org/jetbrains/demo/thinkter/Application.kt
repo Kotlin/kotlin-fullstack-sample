@@ -22,6 +22,7 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
 
     init {
         state = ApplicationPageState(MainView.Home)
+        checkUserSession()
     }
 
     override fun ReactDOMBuilder.render() {
@@ -31,13 +32,17 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
                     div("brand-title") {
                         +"Thinkter"
 
-                        onClickFunction = { mainViewSelected() }
+                        if (state.selected != MainView.Loading) {
+                            onClickFunction = { mainViewSelected() }
+                        }
                     }
                     nav("nav") {
-                        NavBarComponent {
-                            user = state.currentUser
-                            handler = { navBarSelected(it) }
-                            logoutHandler = { onLoggedOut() }
+                        if (state.selected != MainView.Loading) {
+                            NavBarComponent {
+                                user = state.currentUser
+                                handler = { navBarSelected(it) }
+                                logoutHandler = { onLoggedOut() }
+                            }
                         }
                     }
                 }
@@ -45,6 +50,7 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
 
             div("content pure-u-1 pure-u-md-3-4") {
                 when (state.selected) {
+                    MainView.Loading -> h1 { +"Loading..." }
                     MainView.Home -> HomeView {
                         showThought = { t -> onShowThought(t) }
                     }
@@ -117,9 +123,21 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
             selected = MainView.Home
         }
     }
+
+    private fun checkUserSession() {
+        checkSession().then(
+                { user -> onUserAssigned(user) },
+                { t ->
+                    setState {
+                        selected = MainView.Home
+                    }
+                }
+        )
+    }
 }
 
 enum class MainView {
+    Loading,
     Register,
     Login,
     User,
