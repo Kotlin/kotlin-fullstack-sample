@@ -52,6 +52,13 @@ fun logoutUser(): Promise<Unit> {
     }).then({ Unit })
 }
 
+fun deleteThought(id: Int, date: Long, code: String): Promise<Unit> {
+    return postAndParseResult("/thought/$id/delete", URLSearchParams().apply {
+        append("date", date.toString())
+        append("code", code)
+    }, { Unit })
+}
+
 private fun parseIndexResponse(json: dynamic): IndexResponse {
     val top = json.top as Array<dynamic>
     val latest = json.latest as Array<dynamic>
