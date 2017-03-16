@@ -6,22 +6,28 @@ import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
 
-class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, BoxedState<User?>>() {
+class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, ReactComponentNoState>() {
 
-    companion object : ReactComponentSpec<NavBarComponent, NavBarHandlerProps, BoxedState<User?>>
+    companion object : ReactComponentSpec<NavBarComponent, NavBarHandlerProps, ReactComponentNoState>
 
     init {
-        state = BoxedState(null)
+        state = ReactComponentNoState()
     }
 
     override fun ReactDOMBuilder.render() {
-        val user = state.state
+        val user = props.user
 
         ul(classes = "nav-list") {
             if (user != null) {
-                navItem("Timeline")
-                navItem("New thought")
-                navItem("Sign out, ${user.displayName}")
+                navItem("Timeline") {
+                    timeline()
+                }
+                navItem("New thought") {
+                    postNew()
+                }
+                navItem("Sign out, ${user.displayName.takeIf(String::isNotBlank) ?: user.userId}") {
+                    logout()
+                }
             } else {
                 navItem("Sign up") {
                     register()
@@ -33,6 +39,10 @@ class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, Bo
         }
     }
 
+    private fun timeline() {
+        props.handler(MainView.Home)
+    }
+
     private fun register() {
         props.handler(MainView.Register)
     }
@@ -41,9 +51,19 @@ class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, Bo
         props.handler(MainView.Login)
     }
 
+    private fun logout() {
+        logoutUser().then({
+            props.logoutHandler()
+        })
+    }
+
+    private fun postNew() {
+        props.handler(MainView.PostThought)
+    }
+
     private fun UL.navItem(title: String, function: () -> Unit = {}) {
         li(classes = "nav-item") {
-            a(classes = "pure-button", href = "javascript:void()") {
+            a(classes = "pure-button", href = "javascript:void(0)") {
                 +title
                 onClickFunction = { function() }
             }
@@ -51,6 +71,8 @@ class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, Bo
     }
 
     class NavBarHandlerProps : RProps() {
+        var user: User? = null
+        var logoutHandler: () -> Unit = {}
         var handler: (MainView) -> Unit = {}
     }
 }

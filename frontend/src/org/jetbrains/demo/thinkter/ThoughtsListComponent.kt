@@ -1,24 +1,25 @@
 package org.jetbrains.demo.thinkter
 
 import kotlinx.html.*
+import kotlinx.html.js.*
 import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
 
-class ThoughtsListComponent : ReactDOMComponent<ReactComponentNoProps, BoxedState<List<Thought>>>() {
-    companion object : ReactComponentSpec<ThoughtsListComponent, ReactComponentNoProps, BoxedState<List<Thought>>>
+class ThoughtsListComponent : ReactDOMComponent<ThoughtsListComponent.Props, ReactComponentNoState>() {
+    companion object : ReactComponentSpec<ThoughtsListComponent, Props, ReactComponentNoState>
 
     init {
-        state = BoxedState(emptyList())
+        state = ReactComponentNoState()
     }
 
     override fun ReactDOMBuilder.render() {
         div {
             ul {
-                if (state.state.isEmpty()) {
+                if (props.thoughts.isEmpty()) {
                     li { +"There are no thoughts yet" }
                 } else {
-                    for (t in state.state) {
+                    for (t in props.thoughts) {
                         thoughtLi(t)
                     }
                 }
@@ -31,10 +32,14 @@ class ThoughtsListComponent : ReactDOMComponent<ReactComponentNoProps, BoxedStat
             section(classes = "post") {
                 header(classes = "post-header") {
                     p(classes = "post-meta") {
-                        a(href = "javascript:void") {
+                        a(href = "javascript:void(0)") {
                             +t.date
                             +" by "
                             +t.userId
+
+                            onClickFunction = {
+                                props.show(t)
+                            }
                         }
                     }
                 }
@@ -44,4 +49,6 @@ class ThoughtsListComponent : ReactDOMComponent<ReactComponentNoProps, BoxedStat
             }
         }
     }
+
+    class Props(var thoughts: List<Thought> = emptyList(), var show: (Thought) -> Unit = {}) : RProps()
 }

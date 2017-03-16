@@ -2,15 +2,18 @@ package org.jetbrains.demo.thinkter
 
 import kotlinx.html.*
 import kotlinx.html.js.*
+import org.jetbrains.common.*
+import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
+import kotlin.browser.*
 
 
-class RegisterComponent : ReactDOMPropslessComponent<BoxedState<RegisterFormState>>() {
-    companion object : ReactComponentSpec<RegisterComponent, ReactComponentNoProps, BoxedState<RegisterFormState>>
+class RegisterComponent : ReactDOMComponent<UserProps, RegisterFormState>() {
+    companion object : ReactComponentSpec<RegisterComponent, UserProps, RegisterFormState>
 
     init {
-        state = BoxedState(RegisterFormState("", "", "", ""))
+        state = RegisterFormState("", "", "", "", null, false)
     }
 
     override fun ReactDOMBuilder.render() {
@@ -20,47 +23,63 @@ class RegisterComponent : ReactDOMPropslessComponent<BoxedState<RegisterFormStat
 
                 fieldSet(classes = "pure-group") {
                     input(type = InputType.text, name = "login") {
-                        value = state.state.login
+                        value = state.login
                         placeholder = "Login"
-                        onChangeFunction = {
+                        disabled = state.disabled
+
+                        onChangeFunction = { e ->
                             setState {
-                                state = state.copy(login = value)
+                                login = e.inputValue
                             }
                         }
                     }
                     input(type = InputType.text, name = "email") {
-                        value = state.state.password
+                        value = state.email
                         placeholder = "Email"
-                        onChangeFunction = {
+                        disabled = state.disabled
+
+                        onChangeFunction = { e ->
                             setState {
-                                state = state.copy(email = this@input.value)
+                                email = e.inputValue
                             }
                         }
                     }
                     input(type = InputType.password, name = "password") {
-                        value = state.state.password
+                        value = state.password
                         placeholder = "Password"
-                        onChangeFunction = {
+                        disabled = state.disabled
+
+                        onChangeFunction = { e ->
                             setState {
-                                state = state.copy(password = this@input.value)
+                                password = e.inputValue
                             }
                         }
                     }
                 }
                 fieldSet(classes = "pure-group") {
                     input(type = InputType.text, name = "displayName") {
-                        value = state.state.login
+                        value = state.displayName
                         placeholder = "Display name"
-                        onChangeFunction = {
+                        disabled = state.disabled
+
+                        onChangeFunction = { e ->
                             setState {
-                                state = state.copy(displayName = value)
+                                displayName = e.inputValue
                             }
                         }
                     }
                 }
 
+                state.errorMessage?.takeIf(String::isNotEmpty)?.let { message ->
+                    label {
+                        + message
+                    }
+                }
+
                 button(classes = "pure-button pure-button-primary") {
                     +"Register"
+                    disabled = state.disabled
+
                     onClickFunction = {
                         doRegister()
                         it.preventDefault()
@@ -70,8 +89,34 @@ class RegisterComponent : ReactDOMPropslessComponent<BoxedState<RegisterFormStat
         }
     }
 
-    fun doRegister() {
+    private fun doRegister() {
+        setState {
+            disabled = true
+        }
+        with(state) {
+            register(login, password, displayName, email)
+                    .then({ user -> registered(user) })
+                    .catch { e -> registrationFailed(e) }
+        }
+    }
+
+    private fun registered(user: User) {
+        props.userAssigned(user)
+    }
+
+    private fun registrationFailed(e: Throwable) {
+        if (e is LoginOrRegisterFailedException) {
+            setState {
+                errorMessage = e.message
+                disabled = false
+            }
+        } else {
+            console.log("Registration failed", e)
+            setState {
+                errorMessage = "Registration failed"
+            }
+        }
     }
 }
 
-data class RegisterFormState(val login: String, val displayName: String, val password: String, val email: String)
+class RegisterFormState(var login: String, var displayName: String, var password: String, var email: String, var errorMessage: String?, var disabled: Boolean) : RState

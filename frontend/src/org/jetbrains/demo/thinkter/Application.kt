@@ -2,9 +2,9 @@ package org.jetbrains.demo.thinkter
 
 import kotlinx.html.*
 import kotlinx.html.js.*
+import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
-import runtime.wrappers.*
 import kotlin.browser.*
 
 fun main(args: Array<String>) {
@@ -15,22 +15,6 @@ fun main(args: Array<String>) {
             Application {}
         }
     }
-}
-
-class Home : ReactDOMComponent<ReactComponentNoProps, ReactComponentNoState>() {
-    companion object : ReactComponentSpec<Home, ReactComponentNoProps, ReactComponentNoState>
-
-    init {
-        state = ReactComponentNoState()
-    }
-
-    override fun ReactDOMBuilder.render() {
-        div {
-            h2 { +"Thoughts" }
-            ThoughtsListComponent {}
-        }
-    }
-
 }
 
 class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageState>() {
@@ -51,7 +35,9 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
                     }
                     nav("nav") {
                         NavBarComponent {
+                            user = state.currentUser
                             handler = { navBarSelected(it) }
+                            logoutHandler = { onLoggedOut() }
                         }
                     }
                 }
@@ -59,11 +45,22 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
 
             div("content pure-u-1 pure-u-md-3-4") {
                 when (state.selected) {
-                    MainView.Home -> Home {}
-                    MainView.Login -> LoginComponent {}
-                    MainView.Register -> RegisterComponent {}
+                    MainView.Home -> HomeView {
+                        showThought = { t -> onShowThought(t) }
+                    }
+                    MainView.Login -> LoginComponent {
+                        userAssigned = { onUserAssigned(it) }
+                    }
+                    MainView.Register -> RegisterComponent {
+                        userAssigned = { onUserAssigned(it) }
+                    }
+                    MainView.PostThought -> NewThoughComponent {
+                        showThought = { t -> onShowThought(t) }
+                    }
                     MainView.User -> {}
-                    MainView.Though -> {}
+                    MainView.Though -> ViewThoughtComponent {
+                        thought = state.currentThought ?: Thought(0, "?", "?", "?", null)
+                    }
                 }
             }
 
@@ -73,9 +70,35 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
         }
     }
 
+    private fun onLoggedOut() {
+        val oldSelected = state.selected
+
+        setState {
+            currentUser = null
+            selected = when (oldSelected) {
+                MainView.Home, MainView.Though, MainView.Login, MainView.Register -> oldSelected
+                else -> MainView.Home
+            }
+        }
+    }
+
+    private fun onShowThought(t: Thought) {
+        setState {
+            currentThought = t
+            selected = MainView.Though
+        }
+    }
+
     private fun navBarSelected(newSelected: MainView) {
         setState {
             selected = newSelected
+        }
+    }
+
+    private fun onUserAssigned(user: User) {
+        setState {
+            currentUser = user
+            selected = MainView.Home
         }
     }
 
@@ -90,9 +113,12 @@ enum class MainView {
     Register,
     Login,
     User,
+    PostThought,
     Though,
     Home
 }
 
-class ApplicationPageState(var selected: MainView) : RState
-
+class ApplicationPageState(var selected: MainView, var currentUser: User? = null, var currentThought: Thought? = null) : RState
+class UserProps : RProps() {
+    var userAssigned: (User) -> Unit = {}
+}
