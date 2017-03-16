@@ -21,13 +21,13 @@ fun Route.login(dao: ThinkterStorage, hash: (String) -> String) {
         }
 
         if (login == null) {
-            call.respond(HttpStatusCode.Forbidden)
+            call.respond(LoginResponse(error = "Invalid username or password"))
         } else {
             call.session(Session(login.userId))
-            call.redirect(LoginResponse(login))
+            call.respond(LoginResponse(login))
         }
     }
-    get<Logout> {
+    post<Logout> {
         call.clearSession()
         call.respond(HttpStatusCode.OK)
     }

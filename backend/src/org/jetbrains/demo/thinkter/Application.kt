@@ -1,10 +1,10 @@
 package org.jetbrains.demo.thinkter
 
-import com.github.salomonbrys.kotson.*
 import com.google.gson.*
 import org.jetbrains.demo.thinkter.dao.*
 import org.jetbrains.demo.thinkter.model.*
 import org.jetbrains.ktor.application.*
+import org.jetbrains.ktor.content.*
 import org.jetbrains.ktor.features.*
 import org.jetbrains.ktor.http.*
 import org.jetbrains.ktor.locations.*
@@ -38,7 +38,7 @@ fun Application.main() {
     }
 
     transform.register<RpcData> {
-        Gson().toJson(it)
+        TextContent(Gson().toJson(it), ContentType.Application.Json)
     }
 
     routing {
