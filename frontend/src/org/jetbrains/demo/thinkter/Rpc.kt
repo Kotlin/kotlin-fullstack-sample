@@ -19,6 +19,10 @@ fun register(userId: String, password: String, displayName: String, email: Strin
     }, ::parseLoginOrRegisterResponse)
 }
 
+fun checkSession(): Promise<User> {
+    return getAndParseResult("/login", null, ::parseLoginOrRegisterResponse)
+}
+
 fun login(userId: String, password: String): Promise<User> {
     return postAndParseResult("/login", URLSearchParams().apply {
         append("userId", userId)
