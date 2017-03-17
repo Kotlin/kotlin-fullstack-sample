@@ -6,22 +6,48 @@ import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
 
-class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, ReactComponentNoState>() {
+class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, NavBarComponent.NavBarState>() {
 
-    companion object : ReactComponentSpec<NavBarComponent, NavBarHandlerProps, ReactComponentNoState>
+    companion object : ReactComponentSpec<NavBarComponent, NavBarHandlerProps, NavBarState>
 
     init {
-        state = ReactComponentNoState()
+        state = NavBarState()
+    }
+
+    override fun componentDidMount() {
+        props.poller?.let { p ->
+            p.listeners.add(pollerHandler)
+            p.start()
+        }
+
+        super.componentDidMount()
+    }
+
+    override fun componentWillUnmount() {
+        super.componentWillUnmount()
+        props.poller?.listeners?.remove(pollerHandler)
     }
 
     override fun ReactDOMBuilder.render() {
         val user = props.user
+        val newMessages = state.newMessages
 
         ul(classes = "nav-list") {
-            if (user != null) {
-                navItem("Timeline") {
-                    timeline()
+            val timelineText = "Timeline" + when (newMessages) {
+                Polling.NewMessages.None -> ""
+                is Polling.NewMessages.Few -> "(${newMessages.n})"
+                is Polling.NewMessages.MoreThan -> "(${newMessages.n}+"
+            }
+
+            navItem(timelineText) {
+                props.poller?.start()
+                timeline()
+                setState {
+                    this.newMessages = Polling.NewMessages.None
                 }
+            }
+
+            if (user != null) {
                 navItem("New thought") {
                     postNew()
                 }
@@ -36,6 +62,12 @@ class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, Re
                     login()
                 }
             }
+        }
+    }
+
+    private val pollerHandler = { count: Polling.NewMessages ->
+        setState {
+            newMessages = count
         }
     }
 
@@ -70,9 +102,12 @@ class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, Re
         }
     }
 
+    class NavBarState(var newMessages: Polling.NewMessages = Polling.NewMessages.None) : RState
+
     class NavBarHandlerProps : RProps() {
         var user: User? = null
         var logoutHandler: () -> Unit = {}
-        var handler: (MainView) -> Unit = {}
+        var handler: (MainView) -> Unit = { }
+        var poller: Polling? = null
     }
 }

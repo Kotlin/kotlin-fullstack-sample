@@ -9,8 +9,19 @@ class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
     companion object : ReactComponentSpec<HomeView, Props, State>
 
     init {
-        state = State(emptyList(), emptyList(), true)
+        state = State(emptyList(), emptyList(), true, Polling.NewMessages.None)
+    }
+
+    override fun componentWillMount() {
+        super.componentWillMount()
+
+        props.polling.listeners.add(pollerHandler)
         loadHome()
+    }
+
+    override fun componentWillUnmount() {
+        super.componentWillUnmount()
+        props.polling.listeners.remove(pollerHandler)
     }
 
     override fun ReactDOMBuilder.render() {
@@ -37,6 +48,8 @@ class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
 
     private fun loadHome() {
         index().then({ r ->
+            props.polling.start()
+
             setState {
                 loading = false
                 top = r.top
@@ -45,6 +58,16 @@ class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
         })
     }
 
-    class State(var top: List<Thought>, var latest: List<Thought>, var loading: Boolean) : RState
-    class Props(var showThought: (Thought) -> Unit = {}) : RProps()
+    private val pollerHandler = { m : Polling.NewMessages ->
+        val oldMessages = state.newMessages
+        setState {
+            newMessages = m
+        }
+        if (oldMessages != m && m == Polling.NewMessages.None) {
+            loadHome()
+        }
+    }
+
+    class State(var top: List<Thought>, var latest: List<Thought>, var loading: Boolean, var newMessages: Polling.NewMessages) : RState
+    class Props(var polling: Polling, var showThought: (Thought) -> Unit = {}) : RProps()
 }

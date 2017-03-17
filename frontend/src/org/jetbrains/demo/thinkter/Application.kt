@@ -19,10 +19,16 @@ fun main(args: Array<String>) {
 
 class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageState>() {
     companion object : ReactComponentSpec<Application, ReactComponentNoProps, ApplicationPageState>
+    val polling = Polling()
 
     init {
         state = ApplicationPageState(MainView.Home)
         checkUserSession()
+    }
+
+    override fun componentWillUnmount() {
+        polling.stop()
+        super.componentWillUnmount()
     }
 
     override fun ReactDOMBuilder.render() {
@@ -42,6 +48,7 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
                                 user = state.currentUser
                                 handler = { navBarSelected(it) }
                                 logoutHandler = { onLoggedOut() }
+                                poller = this@Application.polling
                             }
                         }
                     }
@@ -53,6 +60,7 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
                     MainView.Loading -> h1 { +"Loading..." }
                     MainView.Home -> HomeView {
                         showThought = { t -> onShowThought(t) }
+                        polling = this@Application.polling
                     }
                     MainView.Login -> LoginComponent {
                         userAssigned = { onUserAssigned(it) }

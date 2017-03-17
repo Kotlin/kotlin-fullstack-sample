@@ -19,6 +19,12 @@ fun register(userId: String, password: String, displayName: String, email: Strin
     }, ::parseLoginOrRegisterResponse)
 }
 
+fun pollFromLastTime(lastTime: String = ""): Promise<String> {
+    return getAndParseResult("/poll?lastTime=$lastTime", null, { json ->
+        json.count
+    })
+}
+
 fun checkSession(): Promise<User> {
     return getAndParseResult("/login", null, ::parseLoginOrRegisterResponse)
 }
