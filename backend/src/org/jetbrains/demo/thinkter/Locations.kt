@@ -6,6 +6,9 @@ import org.jetbrains.ktor.locations.*
 @location("/")
 class Index()
 
+@location("/poll")
+class Poll(val lastTime: String = "")
+
 @location("/post-new")
 data class PostThought(val text: String = "", val date: Long = 0L, val code: String = "", val replyTo: Int? = null)
 
