@@ -1,13 +1,10 @@
 package react
 
-import runtime.wrappers.*
+import runtime.wrappers.toPlainObjectStripNull
 
 interface ReactElement
 
-object React {
-
-    private val raw: ReactSpec = require("react")
-
+internal object ReactWrapper {
     fun normalize(child: Any?) : List<Any> = when(child) {
         null -> listOf()
         is Iterable<*> -> child.filterNotNull()
@@ -16,5 +13,5 @@ object React {
     }
 
     fun createRaw(type: Any, props: dynamic, child: Any? = null): ReactElement =
-       raw.createElement(type, toPlainObjectStripNull(props), *normalize(child).toTypedArray())
+            React.createElement(type, toPlainObjectStripNull(props), *normalize(child).toTypedArray())
 }

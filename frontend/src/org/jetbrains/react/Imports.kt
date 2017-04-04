@@ -6,7 +6,8 @@ external interface ReactUpdater {
     fun enqueueCallback(dest: Any, callback: Any, method: String)
 }
 
-external interface ReactSpec {
-    @JsName("createElement")
+@JsModule("react")
+@JsNonModule
+external object React {
     fun createElement(type: Any, props: dynamic, vararg child: Any): ReactElement
 }

@@ -1,13 +1,13 @@
 package react.dom
 
+import org.w3c.dom.Element
 import react.*
-import org.w3c.dom.*
 
 abstract class ReactDOMComponent<P : RProps, S : RState> : ReactComponent<P, S>() {
     abstract fun ReactDOMBuilder.render()
 
     open fun ReactBuilder.children() {
-        children.addAll(React.normalize(props.children))
+        children.addAll(ReactWrapper.normalize(props.children))
     }
 
     val DOMNode: Element
