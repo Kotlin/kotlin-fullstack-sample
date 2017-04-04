@@ -1,7 +1,6 @@
 package react
 
-import runtime.reflect.*
-import runtime.wrappers.*
+import runtime.reflect.createInstance
 
 
 @DslMarker
@@ -18,7 +17,7 @@ open class ReactBuilder {
             get() = type
 
         fun create() : ReactElement {
-            return React.createRaw(realType, props, children)
+            return ReactWrapper.createRaw(realType, props, children)
         }
     }
 
