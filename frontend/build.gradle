@@ -58,7 +58,7 @@ sourceSets {
     test.resources.srcDirs += "testResources"
 }
 
-task copyResources(type: Sync) {
+task copyResources(type: Copy) {
     from sourceSets.main.resources.srcDirs
 //    into sourceSets.main.output.resourcesDir
     into file(buildDir.path + "/js")
