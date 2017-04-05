@@ -12,14 +12,11 @@ import org.jetbrains.ktor.logging.*
 import org.jetbrains.ktor.routing.*
 import org.jetbrains.ktor.sessions.*
 import org.jetbrains.ktor.transform.*
-import java.io.*
 
 data class Session(val userId: String)
 
 fun Application.main() {
-    val dir = File("build/db")
-    val database = ThinkterDatabase(/*JDBCConnection.Companion.create(H2Dialect, pool)*/)
-    val storage: ThinkterStorage = database /*ThinkterCache(database, File(dir.parentFile, "ehcache"))*/
+    val storage = ThinkterDatabase(/*JDBCConnection.Companion.create(H2Dialect, pool)*/)
 
     install(DefaultHeaders)
     install(CallLogging)
