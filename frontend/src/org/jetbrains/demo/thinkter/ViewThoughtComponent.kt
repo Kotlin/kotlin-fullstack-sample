@@ -32,7 +32,9 @@ class ViewThoughtComponent : ReactDOMComponent<ViewThoughtComponent.Props, React
                 +date
             }
             div(classes = "pure-u-2 pure-u-md-1-1") {
-                +text
+                ReactMarkdownComponent {
+                    source = text
+                }
             }
 
             if (props.currentUser != null) {

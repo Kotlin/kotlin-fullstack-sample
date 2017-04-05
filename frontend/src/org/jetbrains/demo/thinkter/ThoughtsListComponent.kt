@@ -14,6 +14,31 @@ class ThoughtsListComponent : ReactDOMComponent<ThoughtsListComponent.Props, Rea
     }
 
     override fun ReactDOMBuilder.render() {
+        fun UL.thoughtLi(t: Thought) {
+            li {
+                section(classes = "post") {
+                    header(classes = "post-header") {
+                        p(classes = "post-meta") {
+                            a(href = "javascript:void(0)") {
+                                +t.date
+                                +" by "
+                                +t.userId
+
+                                onClickFunction = {
+                                    props.show(t)
+                                }
+                            }
+                        }
+                    }
+                    div(classes = "post-description") {
+                        ReactMarkdownComponent {
+                            source = t.text
+                        }
+                    }
+                }
+            }
+        }
+
         div {
             ul {
                 if (props.thoughts.isEmpty()) {
@@ -22,29 +47,6 @@ class ThoughtsListComponent : ReactDOMComponent<ThoughtsListComponent.Props, Rea
                     for (t in props.thoughts) {
                         thoughtLi(t)
                     }
-                }
-            }
-        }
-    }
-
-    private fun UL.thoughtLi(t: Thought) {
-        li {
-            section(classes = "post") {
-                header(classes = "post-header") {
-                    p(classes = "post-meta") {
-                        a(href = "javascript:void(0)") {
-                            +t.date
-                            +" by "
-                            +t.userId
-
-                            onClickFunction = {
-                                props.show(t)
-                            }
-                        }
-                    }
-                }
-                div(classes = "post-description") {
-                    +t.text
                 }
             }
         }

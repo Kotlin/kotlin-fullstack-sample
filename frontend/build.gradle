@@ -27,6 +27,7 @@ kotlinFrontend {
         dependency("react-router")
         dependency("marked")
         dependency("jquery")
+        dependency("react-markdown")
 
         devDependency("css-loader")
         devDependency("style-loader")
