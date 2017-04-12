@@ -18,3 +18,7 @@ The frontend of Thinkter is built using [React](https://facebook.github.io/react
 it incorporates a set of [wrappers](https://github.com/orangy/thinkter/tree/master/frontend/src/org/jetbrains/react), which
 you can also use in your projects and adapt to your needs.
 
+The project is built using webpack and the [Kotlin frontend plugin](https://github.com/kotlin/kotlin-frontend-plugin). 
+
+To run the frontend, use `./gradlew frontend:run`. This will start a webpack server on port 8080. Navigate to localhost:8080 
+to start using the application.
