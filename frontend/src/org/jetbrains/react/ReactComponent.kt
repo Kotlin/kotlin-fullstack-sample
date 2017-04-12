@@ -1,8 +1,7 @@
 package react
 
-import runtime.reactive.*
-import runtime.reflect.*
-import kotlin.reflect.*
+import runtime.reflect.createInstance
+import kotlin.reflect.KClass
 
 abstract class RProps {
     var key: String? = null
@@ -21,16 +20,18 @@ private var initWrapper: ReactComponentWrapper<*, *, *>? = null
 abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 
     internal val wrapper = initWrapper as ReactComponentWrapper<*, *, S>
-    internal var stateField: Maybe<S> = Maybe.None
+    internal lateinit var stateField: S
     internal var isSealed = false
+    internal var hasState = false
     val props: P
         get() = wrapper.props.asDynamic()
 
     var state: S
-        get() = stateField.orElseThrow()
+        get() = stateField
         set(value) {
             if (!isSealed) {
-                stateField = Maybe.Just(value)
+                stateField = value
+                hasState = true
             } else {
                 throw RuntimeException("You can't set initial state not in constructor")
             }
@@ -57,7 +58,8 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
     }
 
     internal fun setStateFromWrapper(state: S) {
-        stateField = Maybe.Just(state)
+        stateField = state
+        hasState = true
     }
 
     companion object {
@@ -126,11 +128,11 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 class ReactComponentWrapper<K, P : RProps, S : RState>(var props: P, val updater: ReactUpdater, val klazz: KClass<K>) where K : ReactComponent<P, S> {
 
     private val delegate: K
-    private var stateField: Maybe<S> = Maybe.None
+    private var stateField: S
     var state: S
-        get() = stateField.orElseThrow()
+        get() = stateField
         set(value) {
-            stateField = Maybe.Just(value)
+            stateField = value
             delegate.setStateFromWrapper(value)
         }
     var subscribers = ArrayList<ReactComponentLifecycleListener>()
@@ -142,10 +144,10 @@ class ReactComponentWrapper<K, P : RProps, S : RState>(var props: P, val updater
         delegate.seal()
         initWrapper = oldGlobal
 
-        if (!delegate.stateField.hasValue) {
+        if (!delegate.hasState) {
             throw RuntimeException("You haven't set initial state in your constructor of ${klazz.simpleName}!")
         }
-        this.stateField = Maybe.Just(delegate.state)
+        this.stateField = delegate.state
     }
 
     fun setState(stateBuilder: S.() -> Unit) {

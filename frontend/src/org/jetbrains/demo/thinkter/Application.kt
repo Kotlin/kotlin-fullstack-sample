@@ -68,12 +68,12 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
                     MainView.Register -> RegisterComponent {
                         userAssigned = { onUserAssigned(it) }
                     }
-                    MainView.PostThought -> NewThoughComponent {
+                    MainView.PostThought -> NewThoughtComponent {
                         showThought = { t -> onShowThought(t) }
                         replyTo = state.replyTo
                     }
                     MainView.User -> {}
-                    MainView.Though -> ViewThoughtComponent {
+                    MainView.Thought -> ViewThoughtComponent {
                         thought = state.currentThought ?: Thought(0, "?", "?", "?", null)
                         currentUser = state.currentUser
                         reply = { onReplyTo(it) }
@@ -101,7 +101,7 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
         setState {
             currentUser = null
             selected = when (oldSelected) {
-                MainView.Home, MainView.Though, MainView.Login, MainView.Register -> oldSelected
+                MainView.Home, MainView.Thought, MainView.Login, MainView.Register -> oldSelected
                 else -> MainView.Home
             }
         }
@@ -110,7 +110,7 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
     private fun onShowThought(t: Thought) {
         setState {
             currentThought = t
-            selected = MainView.Though
+            selected = MainView.Thought
         }
     }
 
@@ -151,7 +151,7 @@ enum class MainView {
     Login,
     User,
     PostThought,
-    Though,
+    Thought,
     Home
 }
 

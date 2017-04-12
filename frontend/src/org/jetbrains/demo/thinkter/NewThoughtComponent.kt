@@ -7,8 +7,8 @@ import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
 
-class NewThoughComponent : ReactDOMComponent<NewThoughComponent.Props, NewThoughComponent.State>() {
-    companion object : ReactComponentSpec<NewThoughComponent, Props, State>
+class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThoughtComponent.State>() {
+    companion object : ReactComponentSpec<NewThoughtComponent, Props, State>
 
     init {
         state = State()
@@ -31,7 +31,7 @@ class NewThoughComponent : ReactDOMComponent<NewThoughComponent.Props, NewThough
             }
 
             textArea(classes = "pure-input-1-2") {
-                placeholder = "Your though..."
+                placeholder = "Your thought..."
 
                 onChangeFunction = {
                     setState {
