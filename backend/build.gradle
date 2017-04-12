@@ -2,6 +2,7 @@ group = 'org.jetbrains.demo.thinkter'
 version = '0.0.1-SNAPSHOT'
 
 apply plugin: 'kotlin'
+apply plugin: 'application'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -39,3 +40,5 @@ kotlin {
         coroutines "enable"
     }
 }
+
+mainClassName = 'org.jetbrains.ktor.jetty.DevelopmentHost'
