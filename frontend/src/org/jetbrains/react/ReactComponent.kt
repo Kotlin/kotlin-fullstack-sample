@@ -1,6 +1,7 @@
 package react
 
 import runtime.reflect.createInstance
+import runtime.wrappers.js
 import kotlin.reflect.KClass
 
 abstract class RProps {
@@ -113,7 +114,7 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
         wrapper.subscribers.add(listener)
     }
 
-    override fun unsubsctibe(listener: ReactComponentLifecycleListener) {
+    override fun unsubscribe(listener: ReactComponentLifecycleListener) {
         wrapper.subscribers.remove(listener)
     }
 }

@@ -15,7 +15,7 @@ interface ReactComponentLifecycleListener {
 
 interface ReactExtensionProvider {
     fun subscribe(listener: ReactComponentLifecycleListener)
-    fun unsubsctibe(listener: ReactComponentLifecycleListener)
+    fun unsubscribe(listener: ReactComponentLifecycleListener)
 }
 
 abstract class BaseReactExtension(val provider: ReactExtensionProvider) {
@@ -26,7 +26,7 @@ abstract class BaseReactExtension(val provider: ReactExtensionProvider) {
         }
 
         override fun reactComponentWillUnmount() {
-            provider.unsubsctibe(this)
+            provider.unsubscribe(this)
             componentWillUnmount()
         }
 
