@@ -1,7 +1,6 @@
 package react
 
 import runtime.reflect.createInstance
-import runtime.wrappers.js
 import kotlin.reflect.KClass
 
 abstract class RProps {
