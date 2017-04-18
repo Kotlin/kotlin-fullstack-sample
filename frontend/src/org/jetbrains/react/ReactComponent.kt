@@ -113,7 +113,7 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
         wrapper.subscribers.add(listener)
     }
 
-    override fun unsubsctibe(listener: ReactComponentLifecycleListener) {
+    override fun unsubscribe(listener: ReactComponentLifecycleListener) {
         wrapper.subscribers.remove(listener)
     }
 }
