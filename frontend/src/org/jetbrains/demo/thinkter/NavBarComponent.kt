@@ -5,6 +5,7 @@ import kotlinx.html.js.*
 import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
+import kotlinx.coroutines.experimental.launch
 
 class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, NavBarComponent.NavBarState>() {
 
@@ -84,9 +85,10 @@ class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, Na
     }
 
     private fun logout() {
-        logoutUser().then({
+        launch {
+            logoutUser()
             props.logoutHandler()
-        })
+        }
     }
 
     private fun postNew() {

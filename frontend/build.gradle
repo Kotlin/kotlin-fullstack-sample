@@ -68,3 +68,9 @@ afterEvaluate {
     tasks.getByName("webpack-bundle") { dependsOn(copyResources) }
     tasks.getByName("webpack-run") { dependsOn(copyResources) }
 }
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}

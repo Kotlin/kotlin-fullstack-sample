@@ -7,6 +7,7 @@ import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
 import kotlin.browser.*
+import kotlinx.coroutines.experimental.async
 
 
 class RegisterComponent : ReactDOMComponent<UserProps, RegisterFormState>() {
@@ -93,25 +94,26 @@ class RegisterComponent : ReactDOMComponent<UserProps, RegisterFormState>() {
         setState {
             disabled = true
         }
-        with(state) {
-            register(login, password, displayName, email)
-                    .then({ user -> registered(user) })
-                    .catch { e -> registrationFailed(e) }
-        }
+        async {
+            with(state) {
+                val user = register(login, password, displayName, email)
+                registered(user)
+            }
+        }.catch { err -> registrationFailed(err) }
     }
 
     private fun registered(user: User) {
         props.userAssigned(user)
     }
 
-    private fun registrationFailed(e: Throwable) {
-        if (e is LoginOrRegisterFailedException) {
+    private fun registrationFailed(err: Throwable) {
+        if (err is LoginOrRegisterFailedException) {
             setState {
-                errorMessage = e.message
+                errorMessage = err.message
                 disabled = false
             }
         } else {
-            console.log("Registration failed", e)
+            console.log("Registration failed", err)
             setState {
                 errorMessage = "Registration failed"
             }

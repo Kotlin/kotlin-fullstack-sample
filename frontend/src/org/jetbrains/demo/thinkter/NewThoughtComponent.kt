@@ -6,6 +6,7 @@ import org.jetbrains.common.*
 import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
+import kotlinx.coroutines.experimental.async
 
 class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThoughtComponent.State>() {
     companion object : ReactComponentSpec<NewThoughtComponent, Props, State>
@@ -56,11 +57,11 @@ class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThou
     }
 
     private fun doPostThought() {
-        postThoughtPrepare().then({ t ->
-            postThought(props.replyTo?.id, state.text, t).then({ thought ->
-                onSubmitted(thought)
-            }, { onFailed(it) }).catch { onFailed(it) }
-        }, { onFailed(it) }).catch { onFailed(it) }
+        async {
+            val token = postThoughtPrepare()
+            val thought = postThought(props.replyTo?.id, state.text, token)
+            onSubmitted(thought)
+        }.catch { err -> onFailed(err) }
     }
 
     private fun onSubmitted(thought: Thought) {
@@ -71,9 +72,9 @@ class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThou
         props.showThought(thought)
     }
 
-    private fun onFailed(t: Throwable) {
+    private fun onFailed(err: Throwable) {
         setState {
-            errorMessage = t.message
+            errorMessage = err.message
         }
     }
 

@@ -1,47 +1,42 @@
 package org.jetbrains.demo.thinkter
 
+import kotlinx.coroutines.experimental.await
 import org.jetbrains.demo.thinkter.model.*
 import org.w3c.dom.url.*
 import org.w3c.fetch.*
 import kotlin.browser.*
 import kotlin.js.*
 
-fun index(): Promise<IndexResponse> {
-    return getAndParseResult("/", null, ::parseIndexResponse)
-}
+suspend fun index(): IndexResponse =
+    getAndParseResult("/", null, ::parseIndexResponse)
 
-fun register(userId: String, password: String, displayName: String, email: String): Promise<User> {
-    return postAndParseResult("/register", URLSearchParams().apply {
+suspend fun register(userId: String, password: String, displayName: String, email: String): User =
+    postAndParseResult("/register", URLSearchParams().apply {
         append("userId", userId)
         append("password", password)
         append("displayName", displayName)
         append("email", email)
     }, ::parseLoginOrRegisterResponse)
-}
 
-fun pollFromLastTime(lastTime: String = ""): Promise<String> {
-    return getAndParseResult("/poll?lastTime=$lastTime", null, { json ->
+suspend fun pollFromLastTime(lastTime: String = ""): String =
+    getAndParseResult<String>("/poll?lastTime=$lastTime", null, { json ->
         json.count
     })
-}
 
-fun checkSession(): Promise<User> {
-    return getAndParseResult("/login", null, ::parseLoginOrRegisterResponse)
-}
+suspend fun checkSession(): User =
+    getAndParseResult("/login", null, ::parseLoginOrRegisterResponse)
 
-fun login(userId: String, password: String): Promise<User> {
-    return postAndParseResult("/login", URLSearchParams().apply {
+suspend fun login(userId: String, password: String): User =
+    postAndParseResult("/login", URLSearchParams().apply {
         append("userId", userId)
         append("password", password)
     }, ::parseLoginOrRegisterResponse)
-}
 
-fun postThoughtPrepare(): Promise<PostThoughtToken> {
-    return getAndParseResult("/post-new", null, ::parseNewPostTokenResponse)
-}
+suspend fun postThoughtPrepare(): PostThoughtToken =
+    getAndParseResult("/post-new", null, ::parseNewPostTokenResponse)
 
-fun postThought(replyTo: Int?, text: String, token: PostThoughtToken): Promise<Thought> {
-    return postAndParseResult("/post-new", URLSearchParams().apply {
+suspend fun postThought(replyTo: Int?, text: String, token: PostThoughtToken): Thought =
+    postAndParseResult("/post-new", URLSearchParams().apply {
         append("text", text)
         append("date", token.date.toString())
         append("code", token.code)
@@ -49,21 +44,19 @@ fun postThought(replyTo: Int?, text: String, token: PostThoughtToken): Promise<T
             append("replyTo", replyTo.toString())
         }
     }, ::parsePostThoughtResponse)
-}
 
-fun logoutUser(): Promise<Unit> {
-    return window.fetch("/logout", object: RequestInit {
+suspend fun logoutUser() {
+    window.fetch("/logout", object : RequestInit {
         override var method: String? = "POST"
         override var credentials: RequestCredentials? = "same-origin".asDynamic()
-    }).then({ Unit })
+    }).await()
 }
 
-fun deleteThought(id: Int, date: Long, code: String): Promise<Unit> {
-    return postAndParseResult("/thought/$id/delete", URLSearchParams().apply {
+suspend fun deleteThought(id: Int, date: Long, code: String) =
+    postAndParseResult("/thought/$id/delete", URLSearchParams().apply {
         append("date", date.toString())
         append("code", code)
     }, { Unit })
-}
 
 private fun parseIndexResponse(json: dynamic): IndexResponse {
     val top = json.top as Array<dynamic>
@@ -94,24 +87,18 @@ private fun parseLoginOrRegisterResponse(json: dynamic): User {
 
 class LoginOrRegisterFailedException(message: String) : Throwable(message)
 
-fun <T> postAndParseResult(url: String, body: dynamic, parse: (dynamic) -> T): Promise<T> {
-    return requestAndParseResult("POST", url, body, parse)
-}
+suspend fun <T> postAndParseResult(url: String, body: dynamic, parse: (dynamic) -> T): T =
+    requestAndParseResult("POST", url, body, parse)
 
-fun <T> getAndParseResult(url: String, body: dynamic, parse: (dynamic) -> T): Promise<T> {
-    return requestAndParseResult("GET", url, body, parse)
-}
+suspend fun <T> getAndParseResult(url: String, body: dynamic, parse: (dynamic) -> T): T =
+    requestAndParseResult("GET", url, body, parse)
 
-fun <T> requestAndParseResult(method: String, url: String, body: dynamic, parse: (dynamic) -> T): Promise<T> {
-    return Promise { resolve, reject ->
-        window.fetch(url, object: RequestInit {
-            override var method: String? = method
-            override var body: dynamic = body
-            override var credentials: RequestCredentials? = "same-origin".asDynamic()
-            override var headers: dynamic = json("Accept" to "application/json")
-
-        }).then({ response ->
-            response.json().then({ resolve(parse(it)) }, reject).catch(reject)
-        }, reject).catch(reject)
-    }
+suspend fun <T> requestAndParseResult(method: String, url: String, body: dynamic, parse: (dynamic) -> T): T {
+    val response = window.fetch(url, object: RequestInit {
+        override var method: String? = method
+        override var body: dynamic = body
+        override var credentials: RequestCredentials? = "same-origin".asDynamic()
+        override var headers: dynamic = json("Accept" to "application/json")
+    }).await()
+    return parse(response.json().await())
 }

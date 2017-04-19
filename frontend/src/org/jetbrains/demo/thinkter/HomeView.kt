@@ -4,6 +4,7 @@ import kotlinx.html.*
 import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
+import kotlinx.coroutines.experimental.launch
 
 class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
     companion object : ReactComponentSpec<HomeView, Props, State>
@@ -47,15 +48,15 @@ class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
     }
 
     private fun loadHome() {
-        index().then({ r ->
+        launch {
+            val r = index()
             props.polling.start()
-
             setState {
                 loading = false
                 top = r.top
                 latest = r.latest
             }
-        })
+        }
     }
 
     private val pollerHandler = { m : Polling.NewMessages ->
