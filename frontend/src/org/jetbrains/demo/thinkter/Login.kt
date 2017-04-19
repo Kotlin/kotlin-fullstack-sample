@@ -7,6 +7,7 @@ import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
 import kotlin.browser.*
+import kotlinx.coroutines.experimental.async
 
 class LoginComponent : ReactDOMComponent<UserProps, LoginFormState>() {
     companion object : ReactComponentSpec<LoginComponent, UserProps, LoginFormState>
@@ -68,25 +69,24 @@ class LoginComponent : ReactDOMComponent<UserProps, LoginFormState>() {
         setState {
             disabled = true
         }
-
-        login(state.login, state.password).then(
-                { user -> loggedIn(user) },
-                { t -> loginFailed(t) }
-        )
+        async {
+            val user = login(state.login, state.password)
+            loggedIn(user)
+        }.catch { err -> loginFailed(err) }
     }
 
     private fun loggedIn(user: User) {
         props.userAssigned(user)
     }
 
-    private fun loginFailed(t: Throwable) {
-        if (t is LoginOrRegisterFailedException) {
+    private fun loginFailed(err: Throwable) {
+        if (err is LoginOrRegisterFailedException) {
             setState {
                 disabled = false
-                errorMessage = t.message
+                errorMessage = err.message
             }
         } else {
-            console.error("Login failed", t)
+            console.error("Login failed", err)
             setState {
                 disabled = false
                 errorMessage = "Login failed: please reload page and try again"

@@ -6,6 +6,7 @@ import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
 import kotlin.browser.*
+import kotlinx.coroutines.experimental.async
 
 fun main(args: Array<String>) {
     runtime.wrappers.require("pure-blog.css")
@@ -134,14 +135,14 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
     }
 
     private fun checkUserSession() {
-        checkSession().then(
-                { user -> onUserAssigned(user) },
-                { t ->
-                    setState {
-                        selected = MainView.Home
-                    }
-                }
-        )
+        async {
+            val user = checkSession()
+            onUserAssigned(user)
+        }.catch {
+            setState {
+                selected = MainView.Home
+            }
+        }
     }
 }
 

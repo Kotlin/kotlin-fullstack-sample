@@ -7,6 +7,7 @@ import react.*
 import react.dom.*
 import runtime.wrappers.*
 import kotlin.browser.*
+import kotlinx.coroutines.experimental.launch
 
 class ViewThoughtComponent : ReactDOMComponent<ViewThoughtComponent.Props, ReactComponentNoState>() {
 
@@ -69,11 +70,11 @@ class ViewThoughtComponent : ReactDOMComponent<ViewThoughtComponent.Props, React
 
     private fun delete() {
         if (window.confirm("Do you want to delete the thought?")) {
-            postThoughtPrepare().then({ token ->
-                deleteThought(props.thought.id, token.date, token.code).then(
-                        { props.leave() }
-                )
-            })
+            launch {
+                val token = postThoughtPrepare()
+                deleteThought(props.thought.id, token.date, token.code)
+                props.leave
+            }
         }
     }
 

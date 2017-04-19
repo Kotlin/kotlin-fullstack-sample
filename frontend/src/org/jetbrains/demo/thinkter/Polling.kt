@@ -2,6 +2,7 @@ package org.jetbrains.demo.thinkter
 
 import kotlin.browser.*
 import kotlin.js.*
+import kotlinx.coroutines.experimental.launch
 
 class Polling(val period: Int = 20000) {
     private var timerId = 0
@@ -26,15 +27,15 @@ class Polling(val period: Int = 20000) {
     }
 
     fun tick() {
-        pollFromLastTime(lastTime.toString()).then({ newMessagesText ->
+        launch {
+            val newMessagesText = pollFromLastTime(lastTime.toString())
             val newMessages = when {
                 newMessagesText == "0" || newMessagesText.isBlank() -> NewMessages.None
                 newMessagesText.endsWith("+") -> NewMessages.MoreThan(newMessagesText.removeSuffix("+").toInt())
                 else -> NewMessages.Few(newMessagesText.toInt())
             }
-
             listeners.forEach { it(newMessages) }
-        })
+        }
     }
 
     sealed class NewMessages {
