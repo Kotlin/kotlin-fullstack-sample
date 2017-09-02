@@ -6,8 +6,10 @@ backend/.database/*
 !.idea/runConfigurations
 !.idea/runConfigurations/*
 !.idea/vcs.xml
-build
 *.iml
+
+.gradle
+build
 
 *.versionsBackup
 *.releaseBackup
