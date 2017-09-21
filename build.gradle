@@ -20,7 +20,7 @@ subprojects { p ->
 
 subprojects {
     ext.kotlin_version = "1.1.4-3"
-    ext.html_version = "0.6.2"
+    ext.html_version = "0.6.4"
     ext.ktor_version = "0.3.0"
     ext.squash_version = "0.2.2"
 
