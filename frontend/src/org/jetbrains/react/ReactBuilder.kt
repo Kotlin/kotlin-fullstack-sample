@@ -59,14 +59,14 @@ open class ReactBuilder {
         return P::class.createInstance()
     }
 
-    internal inline operator fun <reified T: ReactComponent<P, S>, reified P : RProps, S: RState> ReactComponentSpec<T, P, S>.invoke(
+    inline operator fun <reified T: ReactComponent<P, S>, reified P : RProps, S: RState> ReactComponentSpec<T, P, S>.invoke(
         noinline handler: P.() -> Unit = {}
     ) : ReactElement {
         val props = instantiateProps<P>()
         return node(props) { props.handler() }
     }
 
-    internal inline operator fun <reified T: ReactComponent<P, S>, reified P : RProps, S: RState> ReactComponentSpec<T, P, S>.invoke(
+    inline operator fun <reified T: ReactComponent<P, S>, reified P : RProps, S: RState> ReactComponentSpec<T, P, S>.invoke(
             props: P,
             noinline handler: P.() -> Unit = {}
     ) : ReactElement {
@@ -78,7 +78,7 @@ open class ReactBuilder {
         noinline handler: ReactBuilder.() -> Unit = {}
     ) = enterReactNode(ReactComponent.wrap(T::class), props, handler)
 
-    internal inline operator fun <reified P : RProps> ReactExternalComponentSpec<P>.invoke(
+    inline operator fun <reified P : RProps> ReactExternalComponentSpec<P>.invoke(
         noinline handler: P.() -> Unit = {}
     ) : ReactElement {
         val props = instantiateProps<P>()
