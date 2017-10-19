@@ -17,7 +17,7 @@ class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThou
 
     override fun ReactDOMBuilder.render() {
         form(classes = "pure-form pure-form-stacked") {
-            legEnd {
+            legend {
                 if (props.replyTo == null) {
                     +"New thought"
                 } else {

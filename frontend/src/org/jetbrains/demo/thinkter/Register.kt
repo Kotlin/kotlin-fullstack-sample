@@ -20,7 +20,7 @@ class RegisterComponent : ReactDOMComponent<UserProps, RegisterFormState>() {
     override fun ReactDOMBuilder.render() {
         div {
             form(classes = "pure-form pure-form-stacked") {
-                legEnd { +"Register" }
+                legend { +"Register" }
 
                 fieldSet(classes = "pure-group") {
                     input(type = InputType.text, name = "login") {

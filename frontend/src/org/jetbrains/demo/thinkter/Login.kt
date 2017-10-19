@@ -19,7 +19,7 @@ class LoginComponent : ReactDOMComponent<UserProps, LoginFormState>() {
     override fun ReactDOMBuilder.render() {
         div {
             form(classes = "pure-form pure-form-stacked") {
-                legEnd { +"Login" }
+                legend { +"Login" }
 
                 fieldSet(classes = "pure-group") {
                     input(type = InputType.text, name = "login") {
