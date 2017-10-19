@@ -19,6 +19,7 @@ private var initWrapper: ReactComponentWrapper<*, *, *>? = null
 
 abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 
+    @Suppress("UNCHECKED_CAST")
     internal val wrapper = initWrapper as ReactComponentWrapper<*, *, S>
     internal lateinit var stateField: S
     internal var isSealed = false
@@ -72,9 +73,11 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 
         fun <K, P : RProps, S : RState> wrap(clazz: KClass<K>): (P, Any, ReactUpdater) -> ReactComponentWrapper<K, P, S>  where K : ReactComponent<P, S> {
             if (wrappers[clazz] == null) {
-                wrappers[clazz] = { p: P, context: Any, updater: ReactUpdater -> ReactComponentWrapper(p, updater, clazz) }
+                wrappers[clazz] = { p: P, _: Any, updater: ReactUpdater -> ReactComponentWrapper(p, updater, clazz) }
                 wrappers[clazz].asDynamic().displayName = clazz.js.name
             }
+
+            @Suppress("UNCHECKED_CAST")
             return wrappers[clazz] as (P, Any, ReactUpdater) -> ReactComponentWrapper<K, P, S>
         }
     }

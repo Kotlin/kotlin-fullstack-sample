@@ -12,6 +12,7 @@ inline fun <T> jsObject(builder: T.() -> Unit): T {
 inline fun js(builder: dynamic.() -> Unit): dynamic = jsObject(builder)
 
 fun Any.getOwnPropertyNames(): Array<String> {
+    @Suppress("UNUSED_VARIABLE")
     val me = this
     return js("Object.getOwnPropertyNames(me)")
 }
