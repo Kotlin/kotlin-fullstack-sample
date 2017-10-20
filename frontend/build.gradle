@@ -2,6 +2,7 @@ group = 'org.jetbrains.elemental'
 version = '0.0.1-SNAPSHOT'
 
 apply plugin: 'kotlin2js'
+apply plugin: 'kotlin-dce-js'
 apply plugin: 'org.jetbrains.kotlin.frontend'
 
 repositories {
@@ -54,22 +55,15 @@ compileKotlin2Js {
 }
 
 sourceSets {
-    main.kotlin.srcDirs += "src"
-    main.resources.srcDirs += "resources"
-    main.output.resourcesDir = "build/js/resources"
-    test.kotlin.srcDirs += "test"
-    test.resources.srcDirs += "testResources"
-}
-
-task copyResources(type: Copy) {
-    from sourceSets.main.resources.srcDirs
-//    into sourceSets.main.output.resourcesDir
-    into file(buildDir.path + "/js")
-}
-
-afterEvaluate {
-    tasks.getByName("webpack-bundle") { dependsOn(copyResources) }
-    tasks.getByName("webpack-run") { dependsOn(copyResources) }
+    main {
+        kotlin.srcDirs += "src"
+        resources.srcDirs += "resources"
+        output.resourcesDir = "build/js/resources"
+    }
+    test {
+        kotlin.srcDirs += "test"
+        resources.srcDirs += "testResources"
+    }
 }
 
 kotlin {
