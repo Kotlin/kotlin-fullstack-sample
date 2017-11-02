@@ -82,7 +82,11 @@ class LoginKtTest {
                         "ghi")) { handle ->
             every { attributes.contains(sessionMatcher()) } returns true
 
-            every { attributes.get(sessionMatcher()) } returns Session("userId")
+            every {
+                attributes
+                    .childAs(Session::class.java)
+                    .get(sessionMatcher())
+            } returns Session("userId")
 
             coEvery { respond(any()) } returns null
 
@@ -120,10 +124,10 @@ class LoginKtTest {
             every { dao.user("abcdef", "mlkihg") } returns user
 
             every {
-                val cfg = attributes
+                attributes
                         .childAs(SessionConfig::class.java)
-                        .get(sessionConfigMatcher()) as SessionConfig<*>
-                cfg.sessionType
+                        .get(sessionConfigMatcher())
+                        .sessionType
             } returns Session::class
 
             every { attributes.put(sessionMatcher(), any()) } returns null
@@ -193,7 +197,7 @@ class LoginKtTest {
             every {
                 attributes
                         .childAs(SessionConfig::class.java)
-                        .getOrNull(sessionConfigMatcher()) as SessionConfig<*>
+                        .getOrNull(sessionConfigMatcher())
             } returns null
 
             every { attributes.remove(sessionMatcher()) } returns null
@@ -211,7 +215,7 @@ class LoginKtTest {
     private inline fun MockKScope.sessionMatcher(): AttributeKey<Session> =
             match({ it!!.name == "Session" })
 
-    private inline fun MockKScope.sessionConfigMatcher(): AttributeKey<Any> =
+    private inline fun MockKScope.sessionConfigMatcher(): AttributeKey<SessionConfig<*>> =
             match({ it!!.name == "SessionConfig" })
 
 
