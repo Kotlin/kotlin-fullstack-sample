@@ -17,6 +17,7 @@ import org.jetbrains.ktor.routing.HttpMethodRouteSelector
 import org.jetbrains.ktor.routing.RouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.jetbrains.ktor.sessions.SessionConfig
+import org.jetbrains.ktor.util.AttributeKey
 import org.jetbrains.ktor.util.Attributes
 import org.junit.Before
 import org.junit.Test
@@ -79,23 +80,15 @@ class LoginKtTest {
                 Login("abc",
                         "def",
                         "ghi")) { handle ->
-            every {
-                attributes.contains(match { it!!.name == "Session" })
-            } returns true
+            every { attributes.contains(sessionMatcher()) } returns true
 
-            every {
-                attributes.get(match { it!!.name == "Session" })
-            } returns Session("userId")
+            every { attributes.get(sessionMatcher()) } returns Session("userId")
 
-            coEvery {
-                respond(any())
-            } returns null
+            coEvery { respond(any()) } returns null
 
             handle()
 
-            coVerify {
-                respond(LoginResponse(user))
-            }
+            coVerify { respond(LoginResponse(user)) }
         }
     }
 
@@ -105,19 +98,13 @@ class LoginKtTest {
                 Login("abc",
                         "def",
                         "ghi")) { handle ->
-            every {
-                attributes.contains(match { it!!.name == "Session" })
-            } returns false
+            every { attributes.contains(sessionMatcher()) } returns false
 
-            coEvery {
-                respond(any())
-            } returns null
+            coEvery { respond(any()) } returns null
 
             handle()
 
-            coVerify {
-                respond(HttpStatusCode.Forbidden)
-            }
+            coVerify { respond(HttpStatusCode.Forbidden) }
         }
     }
 
@@ -129,32 +116,25 @@ class LoginKtTest {
 
             every { hash.childAs(String::class.java).invoke("ghiklm") } returns "mlkihg"
             val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
-            every {
-                dao.user("abcdef", "mlkihg")
-            } returns user
+
+            every { dao.user("abcdef", "mlkihg") } returns user
+
             every {
                 val cfg = attributes
                         .childAs(SessionConfig::class.java)
-                        .get(match({ it!!.name == "SessionConfig" })) as SessionConfig<*>
+                        .get(sessionConfigMatcher()) as SessionConfig<*>
                 cfg.sessionType
             } returns Session::class
-            every {
-                attributes.put(match({ it!!.name == "Session" }), any())
-            } returns null
 
-            coEvery {
-                respond(any())
-            } returns null
+            every { attributes.put(sessionMatcher(), any()) } returns null
+
+            coEvery { respond(any()) } returns null
 
             handle()
 
-            coVerify {
-                respond(LoginResponse(user))
-            }
+            coVerify { respond(LoginResponse(user)) }
 
-            coVerify {
-                attributes.put(match({ it!!.name == "Session" }), Session("abcdef"))
-            }
+            coVerify { attributes.put(sessionMatcher(), Session("abcdef")) }
         }
     }
 
@@ -164,15 +144,11 @@ class LoginKtTest {
                 Login("abc",
                         "defghi")) { handle ->
 
-            coEvery {
-                respond(any())
-            } returns null
+            coEvery { respond(any()) } returns null
 
             handle()
 
-            coVerify {
-                respond(LoginResponse(error = "Invalid username or password"))
-            }
+            coVerify { respond(LoginResponse(error = "Invalid username or password")) }
         }
     }
 
@@ -182,15 +158,11 @@ class LoginKtTest {
                 Login("abcdef",
                         "ghi")) { handle ->
 
-            coEvery {
-                respond(any())
-            } returns null
+            coEvery { respond(any()) } returns null
 
             handle()
 
-            coVerify {
-                respond(LoginResponse(error = "Invalid username or password"))
-            }
+            coVerify { respond(LoginResponse(error = "Invalid username or password")) }
         }
     }
 
@@ -200,15 +172,11 @@ class LoginKtTest {
                 Login("#!$%#$$@#",
                         "defghi")) { handle ->
 
-            coEvery {
-                respond(any())
-            } returns null
+            coEvery { respond(any()) } returns null
 
             handle()
 
-            coVerify {
-                respond(LoginResponse(error = "Invalid username or password"))
-            }
+            coVerify { respond(LoginResponse(error = "Invalid username or password")) }
         }
     }
 
@@ -219,33 +187,32 @@ class LoginKtTest {
 
             every { hash.childAs(String::class.java).invoke("ghiklm") } returns "mlkihg"
             val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
-            every {
-                dao.user("abcdef", "mlkihg")
-            } returns user
+
+            every { dao.user("abcdef", "mlkihg") } returns user
+
             every {
                 attributes
                         .childAs(SessionConfig::class.java)
-                        .getOrNull(match({ it!!.name == "SessionConfig" })) as SessionConfig<*>
-            } returns null
-            every {
-                attributes.remove(match({ it!!.name == "Session" }))
+                        .getOrNull(sessionConfigMatcher()) as SessionConfig<*>
             } returns null
 
-            coEvery {
-                respond(any())
-            } returns null
+            every { attributes.remove(sessionMatcher()) } returns null
+
+            coEvery { respond(any()) } returns null
 
             handle()
 
-            coVerify {
-                respond(HttpStatusCode.OK)
-            }
+            coVerify { respond(HttpStatusCode.OK) }
 
-            verify {
-                attributes.remove(match({ it!!.name == "Session" }))
-            }
+            verify { attributes.remove(sessionMatcher()) }
         }
     }
+
+    private inline fun MockKScope.sessionMatcher(): AttributeKey<Session> =
+            match({ it!!.name == "Session" })
+
+    private inline fun MockKScope.sessionConfigMatcher(): AttributeKey<Any> =
+            match({ it!!.name == "SessionConfig" })
 
 
 }
