@@ -16,6 +16,7 @@ import org.jetbrains.ktor.pipeline.PipelineInterceptor
 import org.jetbrains.ktor.routing.HttpMethodRouteSelector
 import org.jetbrains.ktor.routing.RouteSelector
 import org.jetbrains.ktor.routing.Routing
+import org.jetbrains.ktor.sessions.SessionConfig
 import org.jetbrains.ktor.util.Attributes
 import org.junit.Before
 import org.junit.Test
@@ -29,9 +30,9 @@ class LoginKtTest {
     val hash = mockk<(String) -> String>()
     val locations = mockk<Locations>()
 
-    lateinit var getLogin: AppCallSlot
-    lateinit var postLogin: AppCallSlot
-    lateinit var postLogout: AppCallSlot
+    lateinit var getLogin: DslRouteSlot
+    lateinit var postLogin: DslRouteSlot
+    lateinit var postLogout: DslRouteSlot
 
     @Before
     fun setUp() {
@@ -45,17 +46,17 @@ class LoginKtTest {
                     .get(Locations.key)
         } returns locations
 
-        getLogin = route.mockCall(
+        getLogin = route.captureDslRoute(
                 locations,
                 Login::class,
                 HttpMethodRouteSelector(HttpMethod.Get))
 
-        postLogin = route.mockCall(
+        postLogin = route.captureDslRoute(
                 locations,
                 Login::class,
                 HttpMethodRouteSelector(HttpMethod.Post))
 
-        postLogout = route.mockCall(
+        postLogout = route.captureDslRoute(
                 locations,
                 Logout::class,
                 HttpMethodRouteSelector(HttpMethod.Post))
@@ -65,29 +66,7 @@ class LoginKtTest {
     }
 
     @Test
-    fun testLoginForbidden() {
-        getLogin.issueCall(locations,
-                Login("abc",
-                        "def",
-                        "ghi")) { handle ->
-            every {
-                attributes.contains(match { it!!.name == "Session" })
-            } returns false
-
-            coEvery {
-                respond(any())
-            } returns null
-
-            handle()
-
-            coVerify {
-                respond(HttpStatusCode.Forbidden)
-            }
-        }
-    }
-
-    @Test
-    fun testLoginOk() {
+    fun testGetLoginOk() {
         val user = User("userId",
                 "email",
                 "display",
@@ -120,42 +99,181 @@ class LoginKtTest {
         }
     }
 
-    private fun <T : Any> Routing.mockCall(locations: Locations,
-                                           dataClass: KClass<T>,
-                                           selector: RouteSelector): CapturingSlot<PipelineInterceptor<ApplicationCall>> {
+    @Test
+    fun testGetLoginForbidden() {
+        getLogin.issueCall(locations,
+                Login("abc",
+                        "def",
+                        "ghi")) { handle ->
+            every {
+                attributes.contains(match { it!!.name == "Session" })
+            } returns false
 
-        every {
-            this@mockCall
-                    .application
-                    .attributes
-                    .childAs(Attributes::class.java)
-                    .get(ApplicationFeature.registry)
-                    .childAs(Locations::class.java)
-                    .get(Locations.key)
-        } returns locations
+            coEvery {
+                respond(any())
+            } returns null
 
+            handle()
 
-        every {
-            locations.createEntry(this@mockCall, dataClass)
-                    .select(selector)
-                    .parent
-        } returns this
-
-        val lambda = slot<PipelineInterceptor<ApplicationCall>>()
-        every {
-            locations.createEntry(this@mockCall, dataClass)
-                    .select(selector)
-                    .handle(capture(lambda))
-        } returns null
-        return lambda
+            coVerify {
+                respond(HttpStatusCode.Forbidden)
+            }
+        }
     }
+
+    @Test
+    fun testPostLoginOk() {
+        postLogin.issueCall(locations,
+                Login("abcdef",
+                        "ghiklm")) { handle ->
+
+            every { hash.childAs(String::class.java).invoke("ghiklm") } returns "mlkihg"
+            val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
+            every {
+                dao.user("abcdef", "mlkihg")
+            } returns user
+            every {
+                val cfg = attributes
+                        .childAs(SessionConfig::class.java)
+                        .get(match({ it!!.name == "SessionConfig" })) as SessionConfig<*>
+                cfg.sessionType
+            } returns Session::class
+            every {
+                attributes.put(match({ it!!.name == "Session" }), any())
+            } returns null
+
+            coEvery {
+                respond(any())
+            } returns null
+
+            handle()
+
+            coVerify {
+                respond(LoginResponse(user))
+            }
+
+            coVerify {
+                attributes.put(match({ it!!.name == "Session" }), Session("abcdef"))
+            }
+        }
+    }
+
+    @Test
+    fun testPostLoginShortUsername() {
+        postLogin.issueCall(locations,
+                Login("abc",
+                        "defghi")) { handle ->
+
+            coEvery {
+                respond(any())
+            } returns null
+
+            handle()
+
+            coVerify {
+                respond(LoginResponse(error = "Invalid username or password"))
+            }
+        }
+    }
+
+    @Test
+    fun testPostLoginShortPassword() {
+        postLogin.issueCall(locations,
+                Login("abcdef",
+                        "ghi")) { handle ->
+
+            coEvery {
+                respond(any())
+            } returns null
+
+            handle()
+
+            coVerify {
+                respond(LoginResponse(error = "Invalid username or password"))
+            }
+        }
+    }
+
+    @Test
+    fun testPostLoginWrongUsername() {
+        postLogin.issueCall(locations,
+                Login("#!$%#$$@#",
+                        "defghi")) { handle ->
+
+            coEvery {
+                respond(any())
+            } returns null
+
+            handle()
+
+            coVerify {
+                respond(LoginResponse(error = "Invalid username or password"))
+            }
+        }
+    }
+
+    @Test
+    fun testPostLogoutOk() {
+        postLogout.issueCall(locations,
+                Logout()) { handle ->
+
+            every { hash.childAs(String::class.java).invoke("ghiklm") } returns "mlkihg"
+            val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
+            every {
+                dao.user("abcdef", "mlkihg")
+            } returns user
+            every {
+                attributes
+                        .childAs(SessionConfig::class.java)
+                        .getOrNull(match({ it!!.name == "SessionConfig" })) as SessionConfig<*>
+            } returns null
+            every {
+                attributes.remove(match({ it!!.name == "Session" }))
+            } returns null
+
+            coEvery {
+                respond(any())
+            } returns null
+
+            handle()
+
+            coVerify {
+                respond(HttpStatusCode.OK)
+            }
+
+            verify {
+                attributes.remove(match({ it!!.name == "Session" }))
+            }
+        }
+    }
+
+
 }
 
-typealias AppCallSlot = CapturingSlot<PipelineInterceptor<ApplicationCall>>
+private fun <T : Any> Routing.captureDslRoute(locations: Locations,
+                                              dataClass: KClass<T>,
+                                              selector: RouteSelector): DslRouteSlot {
 
-private fun AppCallSlot.issueCall(locations: Locations,
-                                  data: Any,
-                                  block: ApplicationCall.(() -> Unit) -> Unit) {
+    every {
+        locations.createEntry(this@captureDslRoute, dataClass)
+                .select(selector)
+                .parent
+    } returns this
+
+    val lambda = slot<PipelineInterceptor<ApplicationCall>>()
+    every {
+        locations.createEntry(this@captureDslRoute, dataClass)
+                .select(selector)
+                .handle(capture(lambda))
+    } returns null
+    return lambda
+}
+
+typealias DslRouteSlot = CapturingSlot<PipelineInterceptor<ApplicationCall>>
+
+private fun DslRouteSlot.issueCall(locations: Locations,
+                                   data: Any,
+                                   block: ApplicationCall.(() -> Unit) -> Unit) {
 
     runBlocking {
         val ctx = mockk<PipelineContext<ApplicationCall>>()
