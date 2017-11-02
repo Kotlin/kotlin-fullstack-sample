@@ -15,7 +15,6 @@ import org.jetbrains.ktor.routing.HttpMethodRouteSelector
 import org.jetbrains.ktor.routing.RouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.jetbrains.ktor.sessions.SessionConfig
-import org.jetbrains.ktor.util.AttributeKey
 import org.jetbrains.ktor.util.Attributes
 import org.junit.Before
 import org.junit.Test
@@ -39,9 +38,9 @@ class LoginKtTest {
             route
                     .application
                     .attributes
-                    .childAs(Attributes::class.java)
+                    .hint(Attributes::class)
                     .get(ApplicationFeature.registry)
-                    .childAs(Locations::class.java)
+                    .hint(Locations::class)
                     .get(Locations.key)
         } returns locations
 
@@ -82,11 +81,11 @@ class LoginKtTest {
 
             every {
                 attributes
-                    .childAs(Session::class.java)
+                    .hint(Session::class)
                     .get(sessionMatcher())
             } returns Session("userId")
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
@@ -102,7 +101,7 @@ class LoginKtTest {
                         "ghi")) { handle ->
             every { attributes.contains(sessionMatcher()) } returns false
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
@@ -116,21 +115,21 @@ class LoginKtTest {
                 Login("abcdef",
                         "ghiklm")) { handle ->
 
-            every { hash.childAs(String::class.java).invoke("ghiklm") } returns "mlkihg"
+            every { hash.hint(String::class).invoke("ghiklm") } returns "mlkihg"
             val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
 
             every { dao.user("abcdef", "mlkihg") } returns user
 
             every {
                 attributes
-                        .childAs(SessionConfig::class.java)
+                        .hint(SessionConfig::class)
                         .get(sessionConfigMatcher())
                         .sessionType
             } returns Session::class
 
-            every { attributes.put(sessionMatcher(), any()) } returns null
+            every { attributes.put(sessionMatcher(), any()) } just Runs
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
@@ -146,7 +145,7 @@ class LoginKtTest {
                 Login("abc",
                         "defghi")) { handle ->
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
@@ -160,7 +159,7 @@ class LoginKtTest {
                 Login("abcdef",
                         "ghi")) { handle ->
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
@@ -174,7 +173,7 @@ class LoginKtTest {
                 Login("#!$%#$$@#",
                         "defghi")) { handle ->
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
@@ -187,20 +186,20 @@ class LoginKtTest {
         postLogout.issueCall(locations,
                 Logout()) { handle ->
 
-            every { hash.childAs(String::class.java).invoke("ghiklm") } returns "mlkihg"
+            every { hash.hint(String::class).invoke("ghiklm") } returns "mlkihg"
             val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
 
             every { dao.user("abcdef", "mlkihg") } returns user
 
             every {
                 attributes
-                        .childAs(SessionConfig::class.java)
+                        .hint(SessionConfig::class)
                         .getOrNull(sessionConfigMatcher())
             } returns null
 
-            every { attributes.remove(sessionMatcher()) } returns null
+            every { attributes.remove(sessionMatcher()) } just Runs
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
@@ -226,7 +225,7 @@ private fun <T : Any> Routing.captureDslRoute(locations: Locations,
         locations.createEntry(this@captureDslRoute, dataClass)
                 .select(selector)
                 .handle(capture(lambda))
-    } returns null
+    } just Runs
     return lambda
 }
 

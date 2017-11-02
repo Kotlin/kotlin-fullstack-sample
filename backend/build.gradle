@@ -17,7 +17,7 @@ dependencies {
     testCompile("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testCompile "org.jetbrains.ktor:ktor-test-host:$ktor_version"
     testCompile "org.jsoup:jsoup:1.9.1"
-    testCompile "io.mockk:mockk:1.1"
+    testCompile "io.mockk:mockk:1.2"
     testCompile 'com.willowtreeapps.assertk:assertk:0.9'
 
     compile "org.jetbrains.ktor:ktor-jetty:$ktor_version"

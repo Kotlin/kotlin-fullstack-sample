@@ -1,9 +1,6 @@
 package org.jetbrains.demo.thinkter
 
-import io.mockk.CapturingSlot
-import io.mockk.MockKScope
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.application.ApplicationFeature
@@ -29,9 +26,9 @@ class RouteDslMock(val route: Route, val locations: Locations) {
             route
                     .application
                     .attributes
-                    .childAs(Attributes::class.java)
+                    .hint(Attributes::class)
                     .get(ApplicationFeature.registry)
-                    .childAs(Locations::class.java)
+                    .hint(Locations::class)
                     .get(Locations.key)
         } returns locations
     }
@@ -58,7 +55,7 @@ class RouteDslMock(val route: Route, val locations: Locations) {
     }
 
     fun RouteDslMock.captureHandle(slot: DslRouteSlot) {
-        every { this@captureHandle.route.handle(capture(slot)) } returns null
+        every { this@captureHandle.route.handle(capture(slot)) } just Runs
     }
 }
 
@@ -70,12 +67,12 @@ fun DslRouteSlot.issueCall(locations: Locations,
         val ctx = mockk<PipelineContext<ApplicationCall>>()
         val call = mockk<ApplicationCall>()
         every {
-            locations.childAs(data.javaClass)
+            locations.hint(data.javaClass.kotlin)
                     .resolve<Any>(data.javaClass.kotlin, call)
         } returns data
 
         every {
-            ctx.childAs(ApplicationCall::class.java)
+            ctx.hint(ApplicationCall::class)
                     .subject
         } returns call
 
@@ -88,9 +85,9 @@ fun DslRouteSlot.issueCall(locations: Locations,
 
 }
 
-inline fun MockKScope.sessionMatcher(): AttributeKey<Session> =
+inline fun MockKMatcherScope.sessionMatcher(): AttributeKey<Session> =
         match({ it!!.name == "Session" })
 
-inline fun MockKScope.sessionConfigMatcher(): AttributeKey<SessionConfig<*>> =
+inline fun MockKMatcherScope.sessionConfigMatcher(): AttributeKey<SessionConfig<*>> =
         match({ it!!.name == "SessionConfig" })
 

@@ -92,7 +92,7 @@ class IndexKtTest {
 
             every {
                 attributes
-                        .childAs(Session::class.java)
+                        .hint(Session::class)
                         .get(sessionMatcher())
             } returns Session("userId")
 
@@ -113,22 +113,18 @@ class IndexKtTest {
                         null)
             }
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
-            every { response.pipeline.intercept(any(), any()) } returns null
+            every { response.pipeline.intercept(any(), any()) } just Runs
 
             handle()
 
             coVerify {
-                respond(match<IndexResponse> {
-                    val oneToTen = (1..10).toList().toTypedArray()
+                respond(assert<IndexResponse>(msg = "response should have top and latest with ids from one to ten") {
+                    val oneToTen = (1..10).toList()
 
-                    assertk.assert(it!!.top.map { it.id })
-                            .containsAll(*oneToTen)
-
-                    assertk.assert(it.latest.map { it.id })
-                            .containsAll(*oneToTen)
-                    true
+                    it!!.top.map { it.id }.containsAll(oneToTen)
+                        && it.latest.map { it.id }.containsAll(oneToTen)
                 })
             }
         }
@@ -137,16 +133,12 @@ class IndexKtTest {
     @Test
     fun testGetPollJsonBlank() {
         getJsonPoll.issueCall(locations, Poll("")) { handle ->
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
             coVerify {
-                respond(match<PollResponse> {
-                    assertk.assert(it!!.count)
-                            .isEqualTo("0")
-                    true
-                })
+                respond(assert<PollResponse> { it!!.count == "0" })
             }
         }
     }
@@ -177,16 +169,12 @@ class IndexKtTest {
                         null)
             }
 
-            coEvery { respond(any()) } returns null
+            coEvery { respond(any()) } just Runs
 
             handle()
 
             coVerify {
-                respond(match<PollResponse> {
-                    assertk.assert(it!!.count)
-                            .isEqualTo(responseCount)
-                    true
-                })
+                respond(assert<PollResponse> { it!!.count == responseCount })
             }
         }
     }
