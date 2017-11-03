@@ -22,24 +22,24 @@ class LoginKtTest {
     val hash = mockk<(String) -> String>()
     val locations = mockk<Locations>()
 
-    val getLogin = DslRouteSlot()
-    val postLogin = DslRouteSlot()
-    val postLogout = DslRouteSlot()
+    val getLogin = RouteBlockSlot()
+    val postLogin = RouteBlockSlot()
+    val postLogout = RouteBlockSlot()
 
     @Before
     fun setUp() {
         route.mockDsl(locations) {
             mockObj<Login> {
                 mockSelect(HttpMethodRouteSelector(HttpMethod.Get)) {
-                    captureHandle(getLogin)
+                    captureBlock(getLogin)
                 }
                 mockSelect(HttpMethodRouteSelector(HttpMethod.Post)) {
-                    captureHandle(postLogin)
+                    captureBlock(postLogin)
                 }
             }
             mockObj<Logout> {
                 mockSelect(HttpMethodRouteSelector(HttpMethod.Post)) {
-                    captureHandle(postLogout)
+                    captureBlock(postLogout)
                 }
             }
         }
@@ -58,7 +58,7 @@ class LoginKtTest {
             dao.user("userId", any())
         } returns user
 
-        getLogin.issueCall(locations,
+        getLogin.invokeBlock(locations,
                 Login("abc",
                         "def",
                         "ghi")) { handle ->
@@ -80,7 +80,7 @@ class LoginKtTest {
 
     @Test
     fun testGetLoginForbidden() {
-        getLogin.issueCall(locations,
+        getLogin.invokeBlock(locations,
                 Login("abc",
                         "def",
                         "ghi")) { handle ->
@@ -96,7 +96,7 @@ class LoginKtTest {
 
     @Test
     fun testPostLoginOk() {
-        postLogin.issueCall(locations,
+        postLogin.invokeBlock(locations,
                 Login("abcdef",
                         "ghiklm")) { handle ->
 
@@ -126,7 +126,7 @@ class LoginKtTest {
 
     @Test
     fun testPostLoginShortUsername() {
-        postLogin.issueCall(locations,
+        postLogin.invokeBlock(locations,
                 Login("abc",
                         "defghi")) { handle ->
 
@@ -140,7 +140,7 @@ class LoginKtTest {
 
     @Test
     fun testPostLoginShortPassword() {
-        postLogin.issueCall(locations,
+        postLogin.invokeBlock(locations,
                 Login("abcdef",
                         "ghi")) { handle ->
 
@@ -154,7 +154,7 @@ class LoginKtTest {
 
     @Test
     fun testPostLoginWrongUsername() {
-        postLogin.issueCall(locations,
+        postLogin.invokeBlock(locations,
                 Login("#!$%#$$@#",
                         "defghi")) { handle ->
 
@@ -168,7 +168,7 @@ class LoginKtTest {
 
     @Test
     fun testPostLogoutOk() {
-        postLogout.issueCall(locations,
+        postLogout.invokeBlock(locations,
                 Logout()) { handle ->
 
             every { hash.hint(String::class).invoke("ghiklm") } returns "mlkihg"

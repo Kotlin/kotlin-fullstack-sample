@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 
 fun Route.mockDsl(locations: Locations, block: RouteDslMock.() -> Unit) = RouteDslMock(this, locations).block()
 
-typealias DslRouteSlot = CapturingSlot<PipelineInterceptor<ApplicationCall>>
+typealias RouteBlockSlot = CapturingSlot<PipelineInterceptor<ApplicationCall>>
 
 class RouteDslMock(val route: Route, val locations: Locations) {
     init {
@@ -54,14 +54,14 @@ class RouteDslMock(val route: Route, val locations: Locations) {
         RouteDslMock(nextRoute, locations).block()
     }
 
-    fun RouteDslMock.captureHandle(slot: DslRouteSlot) {
-        every { this@captureHandle.route.handle(capture(slot)) } just Runs
+    fun RouteDslMock.captureBlock(slot: RouteBlockSlot) {
+        every { this@captureBlock.route.handle(capture(slot)) } just Runs
     }
 }
 
-fun DslRouteSlot.issueCall(locations: Locations,
-                           data: Any,
-                           block: ApplicationCall.(() -> Unit) -> Unit) {
+fun RouteBlockSlot.invokeBlock(locations: Locations,
+                               data: Any,
+                               block: ApplicationCall.(() -> Unit) -> Unit) {
 
     runBlocking {
         val ctx = mockk<PipelineContext<ApplicationCall>>()

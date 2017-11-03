@@ -1,8 +1,6 @@
 package org.jetbrains.demo.thinkter
 
 import assertk.assertions.contains
-import assertk.assertions.containsAll
-import assertk.assertions.isEqualTo
 import io.mockk.*
 import io.mockk.junit.MockKJUnit4Runner
 import kotlinx.coroutines.experimental.runBlocking
@@ -10,7 +8,6 @@ import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.IndexResponse
 import org.jetbrains.demo.thinkter.model.PollResponse
 import org.jetbrains.demo.thinkter.model.Thought
-import org.jetbrains.demo.thinkter.model.User
 import org.jetbrains.ktor.cio.ByteBufferWriteChannel
 import org.jetbrains.ktor.html.HtmlContent
 import org.jetbrains.ktor.http.HttpHeaders
@@ -32,9 +29,9 @@ class IndexKtTest {
     val dao = mockk<ThinkterStorage>()
     val locations = mockk<Locations>()
 
-    val getHtmlIndex = DslRouteSlot()
-    val getJsonIndex = DslRouteSlot()
-    val getJsonPoll = DslRouteSlot()
+    val getHtmlIndex = RouteBlockSlot()
+    val getJsonIndex = RouteBlockSlot()
+    val getJsonPoll = RouteBlockSlot()
 
     @Before
     fun setUp() {
@@ -42,19 +39,19 @@ class IndexKtTest {
             mockSelect(HttpHeaderRouteSelector(HttpHeaders.Accept, "text/html")) {
                 mockObj<Index> {
                     mockSelect(HttpMethodRouteSelector(HttpMethod.Get)) {
-                        captureHandle(getHtmlIndex)
+                        captureBlock(getHtmlIndex)
                     }
                 }
             }
             mockSelect(HttpHeaderRouteSelector(HttpHeaders.Accept, "application/json")) {
                 mockObj<Index> {
                     mockSelect(HttpMethodRouteSelector(HttpMethod.Get)) {
-                        captureHandle(getJsonIndex)
+                        captureBlock(getJsonIndex)
                     }
                 }
                 mockObj<Poll> {
                     mockSelect(HttpMethodRouteSelector(HttpMethod.Get)) {
-                        captureHandle(getJsonPoll)
+                        captureBlock(getJsonPoll)
                     }
                 }
             }
@@ -66,7 +63,7 @@ class IndexKtTest {
 
     @Test
     fun testGetIndexHtml() {
-        getHtmlIndex.issueCall(locations, Index()) { handle ->
+        getHtmlIndex.invokeBlock(locations, Index()) { handle ->
             val html = slot<String>()
             coEvery { respond(any()) } answers {
                 runBlocking {
@@ -87,7 +84,7 @@ class IndexKtTest {
 
     @Test
     fun testGetIndexJson() {
-        getJsonIndex.issueCall(locations, Index()) { handle ->
+        getJsonIndex.invokeBlock(locations, Index()) { handle ->
             mockSessionReturningUser(dao)
 
             every { dao.top(10) } returns (1..10).toList()
@@ -121,7 +118,7 @@ class IndexKtTest {
 
     @Test
     fun testGetPollJsonBlank() {
-        getJsonPoll.issueCall(locations, Poll("")) { handle ->
+        getJsonPoll.invokeBlock(locations, Poll("")) { handle ->
             coEvery { respond(any()) } just Runs
 
             handle()
@@ -148,7 +145,7 @@ class IndexKtTest {
     }
 
     private fun checkPoll(pollTime: String, responseCount: String) {
-        getJsonPoll.issueCall(locations, Poll(pollTime)) { handle ->
+        getJsonPoll.invokeBlock(locations, Poll(pollTime)) { handle ->
             every { dao.latest(10) } returns (1..10).toList()
             every { dao.getThought(any()) } answers {
                 Thought(firstArg(),
