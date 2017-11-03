@@ -4,8 +4,10 @@ import io.mockk.*
 import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.PostThoughtToken
+import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.http.HttpHeaders
 import org.jetbrains.ktor.http.HttpMethod
+import org.jetbrains.ktor.http.HttpStatusCode
 import org.jetbrains.ktor.locations.Locations
 import org.jetbrains.ktor.request.host
 import org.jetbrains.ktor.routing.HttpMethodRouteSelector
@@ -41,7 +43,7 @@ class PostThoughtKtTest {
     }
 
     @Test
-    fun testGetPostThought() {
+    fun testGetPostThoughtOk() {
         getPostThought.issueCall(locations, PostThought()) { handle ->
             mockSessionReturningUser(dao)
 
@@ -64,4 +66,16 @@ class PostThoughtKtTest {
         }
     }
 
+    @Test
+    fun testGetPostThoughtForbidden() {
+        getPostThought.issueCall(locations, PostThought()) { handle ->
+            mockSessionReturningNothing()
+
+            coEvery { respond(any()) } just Runs
+
+            handle()
+
+            coVerify { respond(HttpStatusCode.Forbidden) }
+        }
+    }
 }

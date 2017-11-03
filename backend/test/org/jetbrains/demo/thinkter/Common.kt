@@ -19,3 +19,8 @@ fun ApplicationCall.mockSessionReturningUser(dao: ThinkterStorage) {
             "User",
             "pwd")
 }
+
+
+fun ApplicationCall.mockSessionReturningNothing() {
+    every { attributes.contains(sessionMatcher()) } returns false
+}
