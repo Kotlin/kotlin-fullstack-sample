@@ -88,18 +88,7 @@ class IndexKtTest {
     @Test
     fun testGetIndexJson() {
         getJsonIndex.issueCall(locations, Index()) { handle ->
-            every { attributes.contains(sessionMatcher()) } returns true
-
-            every {
-                attributes
-                        .hint(Session::class)
-                        .get(sessionMatcher())
-            } returns Session("userId")
-
-            every { dao.user("userId") } returns User("userId",
-                    "email",
-                    "User",
-                    "pwd")
+            mockSessionReturningUser(dao)
 
             every { dao.top(10) } returns (1..10).toList()
 
