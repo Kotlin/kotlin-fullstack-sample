@@ -5,21 +5,15 @@ import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.LoginResponse
 import org.jetbrains.demo.thinkter.model.User
-import org.jetbrains.ktor.application.ApplicationCall
-import org.jetbrains.ktor.application.ApplicationFeature
 import org.jetbrains.ktor.http.HttpMethod
 import org.jetbrains.ktor.http.HttpStatusCode
 import org.jetbrains.ktor.locations.Locations
-import org.jetbrains.ktor.pipeline.PipelineInterceptor
 import org.jetbrains.ktor.routing.HttpMethodRouteSelector
-import org.jetbrains.ktor.routing.RouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.jetbrains.ktor.sessions.SessionConfig
-import org.jetbrains.ktor.util.Attributes
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.reflect.KClass
 
 @RunWith(MockKJUnit4Runner::class)
 class LoginKtTest {
@@ -28,36 +22,27 @@ class LoginKtTest {
     val hash = mockk<(String) -> String>()
     val locations = mockk<Locations>()
 
-    lateinit var getLogin: DslRouteSlot
-    lateinit var postLogin: DslRouteSlot
-    lateinit var postLogout: DslRouteSlot
+    val getLogin = DslRouteSlot()
+    val postLogin = DslRouteSlot()
+    val postLogout = DslRouteSlot()
 
     @Before
     fun setUp() {
-        every {
-            route
-                    .application
-                    .attributes
-                    .hint(Attributes::class)
-                    .get(ApplicationFeature.registry)
-                    .hint(Locations::class)
-                    .get(Locations.key)
-        } returns locations
-
-        getLogin = route.captureDslRoute(
-                locations,
-                Login::class,
-                HttpMethodRouteSelector(HttpMethod.Get))
-
-        postLogin = route.captureDslRoute(
-                locations,
-                Login::class,
-                HttpMethodRouteSelector(HttpMethod.Post))
-
-        postLogout = route.captureDslRoute(
-                locations,
-                Logout::class,
-                HttpMethodRouteSelector(HttpMethod.Post))
+        route.mockDsl(locations) {
+            mockObj<Login> {
+                mockSelect(HttpMethodRouteSelector(HttpMethod.Get)) {
+                    captureHandle(getLogin)
+                }
+                mockSelect(HttpMethodRouteSelector(HttpMethod.Post)) {
+                    captureHandle(postLogin)
+                }
+            }
+            mockObj<Logout> {
+                mockSelect(HttpMethodRouteSelector(HttpMethod.Post)) {
+                    captureHandle(postLogout)
+                }
+            }
+        }
 
         route.login(dao, hash)
 
@@ -209,23 +194,3 @@ class LoginKtTest {
         }
     }
 }
-
-private fun <T : Any> Routing.captureDslRoute(locations: Locations,
-                                              dataClass: KClass<T>,
-                                              selector: RouteSelector): DslRouteSlot {
-
-    every {
-        locations.createEntry(this@captureDslRoute, dataClass)
-                .select(selector)
-                .parent
-    } returns this
-
-    val lambda = slot<PipelineInterceptor<ApplicationCall>>()
-    every {
-        locations.createEntry(this@captureDslRoute, dataClass)
-                .select(selector)
-                .handle(capture(lambda))
-    } just Runs
-    return lambda
-}
-
