@@ -172,9 +172,13 @@ class LoginKtTest {
                 Logout()) { handle ->
 
             every { hash.hint(String::class).invoke("ghiklm") } returns "mlkihg"
-            val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
 
-            every { dao.user("abcdef", "mlkihg") } returns user
+            every {
+                dao.user("abcdef", "mlkihg")
+            } returns User("abcdef",
+                    "abc@def",
+                    "Abc Def",
+                    "mlkihg")
 
             every {
                 attributes

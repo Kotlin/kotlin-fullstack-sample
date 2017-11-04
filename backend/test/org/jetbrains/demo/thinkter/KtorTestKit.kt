@@ -84,10 +84,3 @@ fun RouteBlockSlot.invokeBlock(locations: Locations,
     }
 
 }
-
-inline fun MockKMatcherScope.sessionMatcher(): AttributeKey<Session> =
-        match({ it!!.name == "Session" })
-
-inline fun MockKMatcherScope.sessionConfigMatcher(): AttributeKey<SessionConfig<*>> =
-        match({ it!!.name == "SessionConfig" })
-

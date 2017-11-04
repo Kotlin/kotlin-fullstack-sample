@@ -1,9 +1,21 @@
 package org.jetbrains.demo.thinkter
 
-import io.mockk.every
+import io.mockk.*
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.User
 import org.jetbrains.ktor.application.ApplicationCall
+import org.jetbrains.ktor.http.HttpHeaders
+import org.jetbrains.ktor.http.HttpStatusCode
+import org.jetbrains.ktor.request.host
+import org.jetbrains.ktor.sessions.SessionConfig
+import org.jetbrains.ktor.util.AttributeKey
+
+fun MockKMatcherScope.sessionMatcher(): AttributeKey<Session> =
+        match({ it!!.name == "Session" })
+
+fun MockKMatcherScope.sessionConfigMatcher(): AttributeKey<SessionConfig<*>> =
+        match({ it!!.name == "SessionConfig" })
+
 
 fun ApplicationCall.mockSessionReturningUser(dao: ThinkterStorage) {
     every { attributes.contains(sessionMatcher()) } returns true
@@ -23,4 +35,24 @@ fun ApplicationCall.mockSessionReturningUser(dao: ThinkterStorage) {
 
 fun ApplicationCall.mockSessionReturningNothing() {
     every { attributes.contains(sessionMatcher()) } returns false
+}
+
+
+
+fun ApplicationCall.checkForbiddenIfSesionReturningNothing(handle: () -> Unit) {
+    mockSessionReturningNothing()
+
+    coEvery { respond(any()) } just Runs
+
+    handle()
+
+    coVerify { respond(HttpStatusCode.Forbidden) }
+}
+
+fun ApplicationCall.mockHostReferrerHash(hash: (String) -> String) {
+    every { request.host() } returns "host"
+
+    every { request.headers[HttpHeaders.Referrer] } returns "http://abc/referrer"
+
+    every { hash.hint(String::class).invoke(any()) } answers { firstArg<String>().reversed() }
 }
