@@ -11,8 +11,6 @@ import org.jetbrains.ktor.routing.Route
 import org.jetbrains.ktor.routing.RouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.jetbrains.ktor.routing.application
-import org.jetbrains.ktor.sessions.SessionConfig
-import org.jetbrains.ktor.util.AttributeKey
 import org.jetbrains.ktor.util.Attributes
 import kotlin.reflect.KClass
 
@@ -48,27 +46,32 @@ class RouteDslMock(val route: Route, val locations: Locations) {
 
     fun RouteDslMock.mockSelect(selector: RouteSelector, block: RouteDslMock.() -> Unit) {
         val nextRoute = mockk<Routing>()
-        every { this@mockSelect.route.select(selector) } returns nextRoute
-        every { nextRoute.parent } returns this@mockSelect.route
+        every { route.select(selector) } returns nextRoute
+        every { nextRoute.parent } returns route
 
         RouteDslMock(nextRoute, locations).block()
     }
 
     fun RouteDslMock.captureBlock(slot: RouteBlockSlot) {
-        every { this@captureBlock.route.handle(capture(slot)) } just Runs
+        every { route.handle(capture(slot)) } just Runs
     }
 }
 
+typealias CallInvoker = () -> Unit
+
 fun RouteBlockSlot.invokeBlock(locations: Locations,
                                data: Any,
-                               block: ApplicationCall.(() -> Unit) -> Unit) {
+                               block: ApplicationCall.(CallInvoker) -> Unit) {
 
     runBlocking {
         val ctx = mockk<PipelineContext<ApplicationCall>>()
+
         val call = mockk<ApplicationCall>()
+
         every {
-            locations.hint(data.javaClass.kotlin)
-                    .resolve<Any>(data.javaClass.kotlin, call)
+            val dataCls = data.javaClass.kotlin
+            locations.hint(dataCls)
+                    .resolve<Any>(dataCls, call)
         } returns data
 
         every {
@@ -76,11 +79,11 @@ fun RouteBlockSlot.invokeBlock(locations: Locations,
                     .subject
         } returns call
 
-        call.block({
+        call.block {
             runBlocking {
                 captured!!.invoke(ctx, call)
             }
-        })
+        }
     }
 
 }

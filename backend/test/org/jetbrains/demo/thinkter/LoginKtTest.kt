@@ -5,6 +5,7 @@ import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.LoginResponse
 import org.jetbrains.demo.thinkter.model.User
+import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.http.HttpMethod
 import org.jetbrains.ktor.http.HttpStatusCode
 import org.jetbrains.ktor.locations.Locations
@@ -104,14 +105,7 @@ class LoginKtTest {
 
             val user = mockUser(dao, "mlkihg")
 
-            every {
-                attributes
-                        .hint(SessionConfig::class)
-                        .get(sessionConfigMatcher())
-                        .sessionType
-            } returns Session::class
-
-            every { attributes.put(sessionMatcher(), any()) } just Runs
+            mockPutSession()
 
             coEvery { respond(any()) } just Runs
 

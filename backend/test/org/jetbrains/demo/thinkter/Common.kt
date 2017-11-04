@@ -60,6 +60,7 @@ fun ApplicationCall.mockHostReferrerHash(hash: (String) -> String) {
     every { hash.hint(String::class).invoke(any()) } answers { firstArg<String>().reversed() }
 }
 
+
 fun mockGetThought(dao: ThinkterStorage, ts: Long) {
     every {
         dao.getThought(any())
@@ -83,3 +84,15 @@ fun mockUser(dao: ThinkterStorage, pwdHash: String? = null): User {
     every { dao.user("abcdef", pwdHash) } returns user
     return user
 }
+
+fun ApplicationCall.mockPutSession() {
+    every {
+        attributes
+                .hint(SessionConfig::class)
+                .get(sessionConfigMatcher())
+                .sessionType
+    } returns Session::class
+
+    every { attributes.put(sessionMatcher(), any()) } just Runs
+}
+
