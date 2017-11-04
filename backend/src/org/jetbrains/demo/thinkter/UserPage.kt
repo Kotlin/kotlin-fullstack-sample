@@ -2,10 +2,11 @@ package org.jetbrains.demo.thinkter
 
 import org.jetbrains.demo.thinkter.dao.*
 import org.jetbrains.demo.thinkter.model.*
-import org.jetbrains.ktor.application.*
-import org.jetbrains.ktor.http.*
-import org.jetbrains.ktor.locations.*
-import org.jetbrains.ktor.routing.*
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.locations.*
+import io.ktor.response.respond
+import io.ktor.routing.*
 
 fun Route.userPage(dao: ThinkterStorage) {
     get<UserThoughts> {

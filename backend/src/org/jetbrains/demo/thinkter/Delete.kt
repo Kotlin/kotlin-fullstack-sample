@@ -1,16 +1,22 @@
 package org.jetbrains.demo.thinkter
 
-import org.jetbrains.demo.thinkter.dao.*
-import org.jetbrains.demo.thinkter.model.*
-import org.jetbrains.ktor.application.*
-import org.jetbrains.ktor.http.*
-import org.jetbrains.ktor.locations.*
-import org.jetbrains.ktor.routing.*
-import org.jetbrains.ktor.sessions.*
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.get
+import io.ktor.locations.post
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.routing.Route
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
+import io.ktor.util.ValuesMap
+import org.jetbrains.demo.thinkter.dao.ThinkterStorage
+import org.jetbrains.demo.thinkter.model.PostThoughtToken
+import org.jetbrains.demo.thinkter.model.RpcData
 
 fun Route.delete(dao: ThinkterStorage, hashFunction: (String) -> String) {
     get<ThoughtDelete> {
-        val user = call.sessionOrNull<Session>()?.let { dao.user(it.userId) }
+        val user = call.sessions.get<Session>()?.let { dao.user(it.userId) }
         val date = System.currentTimeMillis()
 
         if (user == null) {
@@ -22,10 +28,14 @@ fun Route.delete(dao: ThinkterStorage, hashFunction: (String) -> String) {
     }
 
     post<ThoughtDelete> {
-        val user = call.sessionOrNull<Session>()?.let { dao.user(it.userId) }
+        val user = call.sessions.get<Session>()?.let { dao.user(it.userId) }
         val thought = dao.getThought(it.id)
 
-        if (user == null || thought.userId != user.userId || !call.verifyCode(it.date, user, it.code, hashFunction)) {
+        val form = call.receive<ValuesMap>()
+        val date = form["date"]?.toLong() ?: -1
+        val code = form["code"] ?: ""
+
+        if (user == null || thought.userId != user.userId || !call.verifyCode(date, user, code, hashFunction)) {
             call.respond(HttpStatusCode.Forbidden)
         } else {
             dao.deleteThought(it.id)

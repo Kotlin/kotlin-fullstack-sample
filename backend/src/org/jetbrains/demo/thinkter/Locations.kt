@@ -1,6 +1,6 @@
 package org.jetbrains.demo.thinkter
 
-import org.jetbrains.ktor.locations.*
+import io.ktor.locations.*
 
 
 @location("/")
@@ -13,7 +13,7 @@ class Poll(val lastTime: String = "")
 data class PostThought(val text: String = "", val date: Long = 0L, val code: String = "", val replyTo: Int? = null)
 
 @location("/thought/{id}/delete")
-data class ThoughtDelete(val id: Int, val date: Long, val code: String)
+data class ThoughtDelete(val id: Int)
 
 @location("/thought/{id}")
 data class ViewThought(val id: Int)

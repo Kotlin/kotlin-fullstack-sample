@@ -8,10 +8,10 @@ import kotlin.browser.*
 import kotlin.js.*
 
 suspend fun index(): IndexResponse =
-    getAndParseResult("/", null, ::parseIndexResponse)
+    getAndParseResult("/", "application/json", null, ::parseIndexResponse)
 
 suspend fun register(userId: String, password: String, displayName: String, email: String): User =
-    postAndParseResult("/register", URLSearchParams().apply {
+    postAndParseResult("/register", "application/x-www-form-urlencoded", URLSearchParams().apply {
         append("userId", userId)
         append("password", password)
         append("displayName", displayName)
@@ -19,24 +19,24 @@ suspend fun register(userId: String, password: String, displayName: String, emai
     }, ::parseLoginOrRegisterResponse)
 
 suspend fun pollFromLastTime(lastTime: String = ""): String =
-    getAndParseResult<String>("/poll?lastTime=$lastTime", null, { json ->
+    getAndParseResult<String>("/poll?lastTime=$lastTime", "application/x-www-form-urlencoded", null, { json ->
         json.count
     })
 
 suspend fun checkSession(): User =
-    getAndParseResult("/login", null, ::parseLoginOrRegisterResponse)
+    getAndParseResult("/login", "application/json", null, ::parseLoginOrRegisterResponse)
 
 suspend fun login(userId: String, password: String): User =
-    postAndParseResult("/login", URLSearchParams().apply {
+    postAndParseResult("/login", "application/x-www-form-urlencoded", URLSearchParams().apply {
         append("userId", userId)
         append("password", password)
     }, ::parseLoginOrRegisterResponse)
 
 suspend fun postThoughtPrepare(): PostThoughtToken =
-    getAndParseResult("/post-new", null, ::parseNewPostTokenResponse)
+    getAndParseResult("/post-new", "application/json", null, ::parseNewPostTokenResponse)
 
 suspend fun postThought(replyTo: Int?, text: String, token: PostThoughtToken): Thought =
-    postAndParseResult("/post-new", URLSearchParams().apply {
+    postAndParseResult("/post-new", "application/x-www-form-urlencoded", URLSearchParams().apply {
         append("text", text)
         append("date", token.date.toString())
         append("code", token.code)
@@ -53,7 +53,7 @@ suspend fun logoutUser() {
 }
 
 suspend fun deleteThought(id: Int, date: Long, code: String) =
-    postAndParseResult("/thought/$id/delete", URLSearchParams().apply {
+    postAndParseResult("/thought/$id/delete", "application/x-www-form-urlencoded", URLSearchParams().apply {
         append("date", date.toString())
         append("code", code)
     }, { Unit })
@@ -87,18 +87,18 @@ private fun parseLoginOrRegisterResponse(json: dynamic): User {
 
 class LoginOrRegisterFailedException(message: String) : Throwable(message)
 
-suspend fun <T> postAndParseResult(url: String, body: dynamic, parse: (dynamic) -> T): T =
-    requestAndParseResult("POST", url, body, parse)
+suspend fun <T> postAndParseResult(url: String, contentType: String, body: dynamic, parse: (dynamic) -> T): T =
+    requestAndParseResult("POST", url, body, contentType, parse)
 
-suspend fun <T> getAndParseResult(url: String, body: dynamic, parse: (dynamic) -> T): T =
-    requestAndParseResult("GET", url, body, parse)
+suspend fun <T> getAndParseResult(url: String, contentType: String, body: dynamic, parse: (dynamic) -> T): T =
+    requestAndParseResult("GET", url, body, contentType, parse)
 
-suspend fun <T> requestAndParseResult(method: String, url: String, body: dynamic, parse: (dynamic) -> T): T {
+suspend fun <T> requestAndParseResult(method: String, url: String, body: dynamic, contentType: String, parse: (dynamic) -> T): T {
     val response = window.fetch(url, object: RequestInit {
         override var method: String? = method
         override var body: dynamic = body
         override var credentials: RequestCredentials? = "same-origin".asDynamic()
-        override var headers: dynamic = json("Accept" to "application/json")
+        override var headers: dynamic = json("Content-Type" to contentType)
     }).await()
     return parse(response.json().await())
 }
