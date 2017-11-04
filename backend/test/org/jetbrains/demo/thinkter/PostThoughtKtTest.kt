@@ -5,7 +5,6 @@ import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.PostThoughtResult
 import org.jetbrains.demo.thinkter.model.PostThoughtToken
-import org.jetbrains.demo.thinkter.model.Thought
 import org.jetbrains.ktor.http.HttpMethod
 import org.jetbrains.ktor.locations.Locations
 import org.jetbrains.ktor.routing.HttpMethodRouteSelector
@@ -75,14 +74,12 @@ class PostThoughtKtTest {
         postPostThought.invokeBlock(locations, data) { handle ->
             mockSessionReturningUser(dao)
             mockHostReferrerHash(hash)
+            mockGetThought(dao, ts)
 
             every {
                 dao.createThought("userId", "text", any(), any())
             } returns 1
 
-            every {
-                dao.getThought(1)
-            } answers { Thought(1, "userId", "text", ts.toString(), null) }
 
             coEvery { respond(any()) } just Runs
 

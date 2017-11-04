@@ -2,6 +2,7 @@ package org.jetbrains.demo.thinkter
 
 import io.mockk.*
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
+import org.jetbrains.demo.thinkter.model.Thought
 import org.jetbrains.demo.thinkter.model.User
 import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.http.HttpHeaders
@@ -9,6 +10,9 @@ import org.jetbrains.ktor.http.HttpStatusCode
 import org.jetbrains.ktor.request.host
 import org.jetbrains.ktor.sessions.SessionConfig
 import org.jetbrains.ktor.util.AttributeKey
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 fun MockKMatcherScope.sessionMatcher(): AttributeKey<Session> =
         match({ it!!.name == "Session" })
@@ -38,7 +42,6 @@ fun ApplicationCall.mockSessionReturningNothing() {
 }
 
 
-
 fun ApplicationCall.checkForbiddenIfSesionReturningNothing(handle: () -> Unit) {
     mockSessionReturningNothing()
 
@@ -56,3 +59,22 @@ fun ApplicationCall.mockHostReferrerHash(hash: (String) -> String) {
 
     every { hash.hint(String::class).invoke(any()) } answers { firstArg<String>().reversed() }
 }
+
+fun mockGetThought(dao: ThinkterStorage, ts: Long) {
+    every {
+        dao.getThought(any())
+    } answers { Thought(firstArg(),
+            "userId",
+            "text",
+            formatDate(ts + firstArg<Int>()),
+            null) }
+}
+
+private fun formatDate(date: Long): String {
+    return Instant.ofEpochMilli(date)
+            .atZone(ZoneId.systemDefault())
+            .toOffsetDateTime()
+            .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+}
+
+

@@ -3,7 +3,6 @@ package org.jetbrains.demo.thinkter
 import io.mockk.*
 import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
-import org.jetbrains.demo.thinkter.model.PostThoughtResult
 import org.jetbrains.demo.thinkter.model.PostThoughtToken
 import org.jetbrains.demo.thinkter.model.RpcData
 import org.jetbrains.demo.thinkter.model.Thought
@@ -76,10 +75,7 @@ class DeleteKtTest {
         postThoughtDelete.invokeBlock(locations, data) { handle ->
             mockSessionReturningUser(dao)
             mockHostReferrerHash(hash)
-
-            every {
-                dao.getThought(1)
-            } answers { Thought(1, "userId", "text", ts.toString(), null) }
+            mockGetThought(dao, ts)
 
             every {
                 dao.deleteThought(1)

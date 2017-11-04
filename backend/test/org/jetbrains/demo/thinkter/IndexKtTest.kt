@@ -86,18 +86,11 @@ class IndexKtTest {
     fun testGetIndexJson() {
         getJsonIndex.invokeBlock(locations, Index()) { handle ->
             mockSessionReturningUser(dao)
+            mockGetThought(dao, 0)
 
             every { dao.top(10) } returns (1..10).toList()
 
             every { dao.latest(10) } returns (1..10).toList()
-
-            every { dao.getThought(any()) } answers {
-                Thought(firstArg(),
-                        "user" + firstArg(),
-                        "text",
-                        "date",
-                        null)
-            }
 
             coEvery { respond(any()) } just Runs
 
@@ -110,7 +103,7 @@ class IndexKtTest {
                     val oneToTen = (1..10).toList()
 
                     it!!.top.map { it.id }.containsAll(oneToTen)
-                        && it.latest.map { it.id }.containsAll(oneToTen)
+                            && it.latest.map { it.id }.containsAll(oneToTen)
                 })
             }
         }
@@ -146,14 +139,9 @@ class IndexKtTest {
 
     private fun checkPoll(pollTime: String, responseCount: String) {
         getJsonPoll.invokeBlock(locations, Poll(pollTime)) { handle ->
+            mockGetThought(dao, 0)
+
             every { dao.latest(10) } returns (1..10).toList()
-            every { dao.getThought(any()) } answers {
-                Thought(firstArg(),
-                        "userId",
-                        "text",
-                        formatDate(firstArg<Int>().toLong()),
-                        null)
-            }
 
             coEvery { respond(any()) } just Runs
 
@@ -165,11 +153,5 @@ class IndexKtTest {
         }
     }
 
-    private fun formatDate(date: Long): String {
-        return  Instant.ofEpochMilli(date)
-                .atZone(ZoneId.systemDefault())
-                .toOffsetDateTime()
-                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-    }
 }
 
