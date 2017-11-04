@@ -61,7 +61,7 @@ class DeleteKtTest {
     }
 
     @Test
-    fun testGetThoughtDeleteForbidden() {
+    fun testGetThoughtDeleteNotLoggedIn() {
         val data = ThoughtDelete(0, 0, "abc")
         getThoughtDelete.invokeBlock(locations, data) { handle ->
             checkForbiddenIfSesionReturningNothing(handle)
@@ -92,7 +92,7 @@ class DeleteKtTest {
     }
 
     @Test
-    fun testPostThoughtDeleteForbidden() {
+    fun testPostThoughtDeleteNotLoggedIn() {
         val data = ThoughtDelete(1, 0, "abc")
         val ts = System.currentTimeMillis()
         postThoughtDelete.invokeBlock(locations, data) { handle ->

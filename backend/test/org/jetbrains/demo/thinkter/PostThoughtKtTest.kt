@@ -60,7 +60,7 @@ class PostThoughtKtTest {
     }
 
     @Test
-    fun testGetPostThoughtForbidden() {
+    fun testGetPostThoughtNotLoggedIn() {
         getPostThought.invokeBlock(locations, PostThought()) { handle ->
             checkForbiddenIfSesionReturningNothing(handle)
         }
@@ -95,7 +95,7 @@ class PostThoughtKtTest {
     }
 
     @Test
-    fun testPostPostThoughtForbidden() {
+    fun testPostPostThoughtNotLoggedIn() {
         postPostThought.invokeBlock(locations, PostThought()) { handle ->
             checkForbiddenIfSesionReturningNothing(handle)
         }

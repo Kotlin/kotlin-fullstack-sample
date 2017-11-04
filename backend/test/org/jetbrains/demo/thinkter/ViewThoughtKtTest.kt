@@ -62,12 +62,15 @@ class ViewThoughtKtTest {
     }
 
     @Test
-    fun testGetPostThoughtForbidden() {
+    fun testGetPostThoughtNotLoggedIn() {
         getViewThought.invokeBlock(locations, ViewThought(1)) { handle ->
             mockGetThought(dao, 0)
             mockSessionReturningNothing()
+
             coEvery<Unit> { respond(any<Any>()) } just Runs
+
             handle()
+
             coVerify<Unit> {
                 respond(assert<ViewThoughtResponse> {
                     it!!.thought.id == 1 &&

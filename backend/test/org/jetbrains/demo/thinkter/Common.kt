@@ -78,3 +78,8 @@ private fun formatDate(date: Long): String {
 }
 
 
+fun mockUser(dao: ThinkterStorage, pwdHash: String? = null): User {
+    val user = User("abcdef", "abc@def", "Abc Def", pwdHash ?: "")
+    every { dao.user("abcdef", pwdHash) } returns user
+    return user
+}

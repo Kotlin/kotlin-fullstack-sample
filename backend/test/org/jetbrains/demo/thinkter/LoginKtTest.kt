@@ -79,7 +79,7 @@ class LoginKtTest {
     }
 
     @Test
-    fun testGetLoginForbidden() {
+    fun testGetLoginNotLoggedIn() {
         getLogin.invokeBlock(locations,
                 Login("abc",
                         "def",
@@ -101,9 +101,8 @@ class LoginKtTest {
                         "ghiklm")) { handle ->
 
             every { hash.hint(String::class).invoke("ghiklm") } returns "mlkihg"
-            val user = User("abcdef", "abc@def", "Abc Def", "mlkihg")
 
-            every { dao.user("abcdef", "mlkihg") } returns user
+            val user = mockUser(dao, "mlkihg")
 
             every {
                 attributes
