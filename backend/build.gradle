@@ -1,3 +1,8 @@
+plugins {
+    id "jacoco"
+    id "com.zoltu.application-agent" version "1.0.8"
+}
+
 group = 'org.jetbrains.demo.thinkter'
 version = '0.0.1-SNAPSHOT'
 
@@ -5,6 +10,8 @@ apply plugin: 'kotlin'
 apply plugin: 'application'
 
 dependencies {
+    agent "io.mockk:mockk-agent:1.3-SNAPSHOT"
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
@@ -17,7 +24,7 @@ dependencies {
     testCompile("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testCompile "org.jetbrains.ktor:ktor-test-host:$ktor_version"
     testCompile "org.jsoup:jsoup:1.9.1"
-    testCompile "io.mockk:mockk:1.2"
+    testCompile "io.mockk:mockk:1.3-SNAPSHOT"
     testCompile 'com.willowtreeapps.assertk:assertk:0.9'
 
     compile "org.jetbrains.ktor:ktor-jetty:$ktor_version"
@@ -44,3 +51,12 @@ kotlin {
 }
 
 mainClassName = 'org.jetbrains.ktor.jetty.DevelopmentHost'
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
+
+check.dependsOn jacocoTestReport

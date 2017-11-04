@@ -67,7 +67,6 @@ class PostThoughtKtTest {
     }
 
     @Test
-    @Ignore // need to wait till next release
     fun testPostPostThoughtOk() {
         val ts = System.currentTimeMillis() - 6000
         val data = PostThought("text", ts, "cba:tsoh:dIresu:" + ts.toString().reversed(), null)

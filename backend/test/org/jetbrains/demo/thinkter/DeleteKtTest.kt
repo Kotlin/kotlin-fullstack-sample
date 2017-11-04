@@ -86,7 +86,7 @@ class DeleteKtTest {
             handle()
 
             coVerify {
-                respond(ofType(RpcData::class.java))
+                respond(ofType(RpcData::class))
             }
         }
     }
