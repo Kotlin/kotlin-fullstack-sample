@@ -1,13 +1,10 @@
 package org.jetbrains.demo.thinkter
 
-import assertk.assertions.contains
 import io.mockk.*
 import io.mockk.junit.MockKJUnit4Runner
-import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.IndexResponse
 import org.jetbrains.demo.thinkter.model.PollResponse
-import org.jetbrains.demo.thinkter.model.Thought
 import org.jetbrains.ktor.cio.ByteBufferWriteChannel
 import org.jetbrains.ktor.html.HtmlContent
 import org.jetbrains.ktor.http.HttpHeaders
@@ -20,8 +17,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.nio.charset.Charset
-import java.time.*
-import java.time.format.DateTimeFormatter
 
 @RunWith(MockKJUnit4Runner::class)
 class IndexKtTest {
@@ -64,21 +59,18 @@ class IndexKtTest {
     @Test
     fun testGetIndexHtml() {
         getHtmlIndex.invokeBlock(locations, Index()) { handle ->
-            val html = slot<String>()
-            coEvery { respond(any()) } answers {
-                runBlocking {
-                    val htmlContent = firstArg<HtmlContent>()
-                    val channel = ByteBufferWriteChannel()
-                    htmlContent.writeTo(channel)
-                    html.captured = channel.toString(Charset.defaultCharset())
-                }
-                nothing
-            }
+            coEvery { respond(any()) } just Runs
 
             handle()
 
-            assertk.assert(html.captured!!)
-                    .contains("<title>Thinkter</title>")
+            coVerify {
+                respond(coAssert<HtmlContent> {
+                    val channel = ByteBufferWriteChannel()
+                    it.writeTo(channel)
+                    val html = channel.toString(Charset.defaultCharset())
+                    html.contains("<title>Thinkter</title>")
+                })
+            }
         }
     }
 
@@ -102,7 +94,7 @@ class IndexKtTest {
                 respond(assert<IndexResponse>(msg = "response should have top and latest with ids from one to ten") {
                     val oneToTen = (1..10).toList()
 
-                    it!!.top.map { it.id }.containsAll(oneToTen)
+                    it.top.map { it.id }.containsAll(oneToTen)
                             && it.latest.map { it.id }.containsAll(oneToTen)
                 })
             }
@@ -117,7 +109,7 @@ class IndexKtTest {
             handle()
 
             coVerify {
-                respond(assert<PollResponse> { it!!.count == "0" })
+                respond(assert<PollResponse> { it.count == "0" })
             }
         }
     }
@@ -148,7 +140,7 @@ class IndexKtTest {
             handle()
 
             coVerify {
-                respond(assert<PollResponse> { it!!.count == responseCount })
+                respond(assert<PollResponse> { it.count == responseCount })
             }
         }
     }

@@ -15,10 +15,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 fun MockKMatcherScope.sessionMatcher(): AttributeKey<Session> =
-        match({ it!!.name == "Session" })
+        match({ it.name == "Session" })
 
 fun MockKMatcherScope.sessionConfigMatcher(): AttributeKey<SessionConfig<*>> =
-        match({ it!!.name == "SessionConfig" })
+        match({ it.name == "SessionConfig" })
 
 
 fun ApplicationCall.mockSessionReturningUser(dao: ThinkterStorage) {

@@ -5,6 +5,7 @@ import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.PostThoughtResult
 import org.jetbrains.demo.thinkter.model.PostThoughtToken
+import org.jetbrains.demo.thinkter.model.Thought
 import org.jetbrains.ktor.http.HttpMethod
 import org.jetbrains.ktor.locations.Locations
 import org.jetbrains.ktor.routing.HttpMethodRouteSelector
@@ -52,7 +53,7 @@ class PostThoughtKtTest {
 
             coVerify {
                 respond(assert<PostThoughtToken> {
-                    it!!.user == "userId" &&
+                    it.user == "userId" &&
                             it.code.contains("cba:tsoh:dIresu")
                 })
             }
@@ -86,7 +87,7 @@ class PostThoughtKtTest {
 
             coVerify {
                 respond(assert<PostThoughtResult> {
-                    it!!.thought.id == 1 &&
+                    it.thought.id == 1 &&
                             it.thought.text == "text"
                 })
             }

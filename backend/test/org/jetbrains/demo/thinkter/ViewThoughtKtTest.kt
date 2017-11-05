@@ -54,7 +54,7 @@ class ViewThoughtKtTest {
 
             coVerify {
                 respond(assert<ViewThoughtResponse> {
-                    it!!.thought.userId == "userId" &&
+                    it.thought.userId == "userId" &&
                             it.code!!.contains("cba:tsoh:dIresu")
                 })
             }
@@ -73,7 +73,7 @@ class ViewThoughtKtTest {
 
             coVerify<Unit> {
                 respond(assert<ViewThoughtResponse> {
-                    it!!.thought.id == 1 &&
+                    it.thought.id == 1 &&
                             it.code == null
                 })
             }

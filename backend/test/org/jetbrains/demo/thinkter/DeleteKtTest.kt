@@ -53,7 +53,7 @@ class DeleteKtTest {
 
             coVerify {
                 respond(assert<PostThoughtToken> {
-                    it!!.user == "userId" &&
+                    it.user == "userId" &&
                             it.code.contains("cba:tsoh:dIresu")
                 })
             }

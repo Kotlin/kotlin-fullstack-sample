@@ -52,7 +52,7 @@ class UserPageKtTest {
 
             coVerify {
                 respond(assert<UserThoughtsResponse> {
-                    it!!.thoughts.any { it.id == 2 && it.text == "text" }
+                    it.thoughts.any { it.id == 2 && it.text == "text" }
                 })
             }
         }

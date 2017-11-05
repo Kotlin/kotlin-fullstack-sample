@@ -62,7 +62,7 @@ class RegisterKtTest {
 
             coVerify {
                 respond(assert<LoginResponse> {
-                    it?.user?.userId == "abcdef"
+                    it.user?.userId == "abcdef"
                 })
             }
 

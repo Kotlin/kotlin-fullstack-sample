@@ -81,7 +81,7 @@ fun RouteBlockSlot.invokeBlock(locations: Locations,
 
         call.block {
             runBlocking {
-                captured!!.invoke(ctx, call)
+                captured.invoke(ctx, call)
             }
         }
     }
