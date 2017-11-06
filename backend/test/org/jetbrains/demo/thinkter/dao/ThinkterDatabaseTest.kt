@@ -8,6 +8,8 @@ import io.mockk.verify
 import org.jetbrains.demo.thinkter.model.User
 import org.jetbrains.squash.connection.DatabaseConnection
 import org.jetbrains.squash.dialect.BaseSQLDialect
+import org.jetbrains.squash.expressions.alias
+import org.jetbrains.squash.expressions.invoke
 import org.jetbrains.squash.results.Response
 import org.jetbrains.squash.results.ResultRow
 import org.jetbrains.squash.results.get
@@ -243,6 +245,60 @@ class ThinkterDatabaseTest {
             }
         }
     }
+
+    @Test
+    fun top() {
+        val response = mockk<Response>()
+        val row = mockk<ResultRow>()
+        every {
+            with(tx()) {
+                any<QueryStatement>().hint(Response::class).execute()
+            }
+        } returns response
+
+        mockSingleRowResponse(response, row)
+
+        val k2 = Thoughts.alias("k2")
+        every { row.hint(Int::class)[Thoughts.id(k2)] } returns 1
+
+        database.top()
+
+        verify {
+            with(tx()) {
+                assert<QueryStatement> {
+                    "SELECT Thoughts.id, COUNT(k2.id) FROM Thoughts LEFT OUTER JOIN Thoughts AS k2 ON Thoughts.id = k2.reply_to GROUP BY Thoughts.id ORDER BY COUNT(k2.id) DESC NULLS LAST LIMIT ?" ==
+                            BaseSQLDialect("dialect").statementSQL(it).sql
+                }.hint(Response::class).execute()
+            }
+        }
+    }
+
+    @Test
+    fun latest() {
+        val response = mockk<Response>()
+        val row = mockk<ResultRow>()
+        every {
+            with(tx()) {
+                any<QueryStatement>().hint(Response::class).execute()
+            }
+        } returns response
+
+        mockSingleRowResponse(response, row)
+
+        every { row.hint(Int::class)[Thoughts.id] } returns 1
+
+        database.latest(1)
+
+        verify {
+            with(tx()) {
+                assert<QueryStatement> {
+                    "SELECT Thoughts.id FROM Thoughts WHERE Thoughts.\"date\" > ? ORDER BY Thoughts.\"date\" DESC NULLS LAST LIMIT ?" ==
+                            BaseSQLDialect("dialect").statementSQL(it).sql
+                }.hint(Response::class).execute()
+            }
+        }
+    }
+
 
     private fun mockSingleRowResponse(response: Response, row: ResultRow) {
         every {
