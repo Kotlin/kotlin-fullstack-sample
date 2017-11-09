@@ -1,10 +1,7 @@
 package org.jetbrains.demo.thinkter.dao
 
-import io.mockk.Runs
-import io.mockk.every
+import io.mockk.*
 import io.mockk.junit.MockKJUnit4Runner
-import io.mockk.mockk
-import io.mockk.verify
 import org.jetbrains.demo.thinkter.model.User
 import org.jetbrains.squash.connection.DatabaseConnection
 import org.jetbrains.squash.dialect.BaseSQLDialect
@@ -20,6 +17,7 @@ import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
 
 @RunWith(MockKJUnit4Runner::class)
 class ThinkterDatabaseTest {
@@ -103,7 +101,6 @@ class ThinkterDatabaseTest {
     }
 
     @Test
-    @Ignore("requires mockk 1.4-SNAPSHOT")
     fun getThought() {
         val response = mockk<Response>()
         val row = mockk<ResultRow>()
@@ -119,13 +116,9 @@ class ThinkterDatabaseTest {
         every { row.hint(String::class)[Thoughts.user] } returns "user"
         every { row.hint(String::class)[Thoughts.text] } returns "text"
 
-//        val localDateTimeRegistration = registerInstanceFactory(LocalDateTime::class, { LocalDateTime.now() })
-//
-//        localDateTimeRegistration.use {
-//            every {
-//                row.hint(LocalDateTime::class)[Thoughts.date]
-//            } returns LocalDateTime.now()
-//        }
+        every {
+            row.hint(LocalDateTime::class)[Thoughts.date]
+        } returns LocalDateTime.now()
 
         every { row.hint(Int::class)[Thoughts.replyTo] } returns null
 
