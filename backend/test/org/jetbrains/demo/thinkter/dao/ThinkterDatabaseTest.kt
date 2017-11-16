@@ -19,7 +19,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.LocalDateTime
 
-@RunWith(MockKJUnit4Runner::class)
 class ThinkterDatabaseTest {
     val connection = mockk<DatabaseConnection>("db")
     fun tx() = connection.createTransaction()

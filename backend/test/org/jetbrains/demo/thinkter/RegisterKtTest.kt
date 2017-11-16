@@ -18,7 +18,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(MockKJUnit4Runner::class)
 class RegisterKtTest {
     val route = mockk<Routing>()
     val dao = mockk<ThinkterStorage>()

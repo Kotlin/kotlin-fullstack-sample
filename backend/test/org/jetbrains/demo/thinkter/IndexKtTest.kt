@@ -18,7 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.nio.charset.Charset
 
-@RunWith(MockKJUnit4Runner::class)
 class IndexKtTest {
     val route = mockk<Routing>()
     val dao = mockk<ThinkterStorage>()

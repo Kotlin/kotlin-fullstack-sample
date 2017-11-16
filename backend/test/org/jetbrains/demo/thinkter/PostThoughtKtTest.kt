@@ -15,7 +15,6 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(MockKJUnit4Runner::class)
 class PostThoughtKtTest {
     val route = mockk<Routing>()
     val dao = mockk<ThinkterStorage>()
