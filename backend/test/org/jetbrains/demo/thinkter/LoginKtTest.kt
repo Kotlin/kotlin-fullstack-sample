@@ -66,7 +66,6 @@ class LoginKtTest {
 
             every {
                 attributes
-                    .hint(Session::class)
                     .get(sessionMatcher())
             } returns Session("userId")
 
@@ -100,7 +99,7 @@ class LoginKtTest {
                 Login("abcdef",
                         "ghiklm")) { handle ->
 
-            every { hash.hint(String::class).invoke("ghiklm") } returns "mlkihg"
+            every { hash.invoke("ghiklm") } returns "mlkihg"
 
             val user = mockUser(dao, "mlkihg")
 
@@ -163,7 +162,7 @@ class LoginKtTest {
         postLogout.invokeBlock(locations,
                 Logout()) { handle ->
 
-            every { hash.hint(String::class).invoke("ghiklm") } returns "mlkihg"
+            every { hash.invoke("ghiklm") } returns "mlkihg"
 
             every {
                 dao.user("abcdef", "mlkihg")
@@ -174,7 +173,6 @@ class LoginKtTest {
 
             every {
                 attributes
-                        .hint(SessionConfig::class)
                         .getOrNull(sessionConfigMatcher())
             } returns null
 

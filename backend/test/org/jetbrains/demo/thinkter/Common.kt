@@ -26,7 +26,6 @@ fun ApplicationCall.mockSessionReturningUser(dao: ThinkterStorage) {
 
     every {
         attributes
-                .hint(Session::class)
                 .get(sessionMatcher())
     } returns Session("userId")
 
@@ -57,7 +56,7 @@ fun ApplicationCall.mockHostReferrerHash(hash: (String) -> String) {
 
     every { request.headers[HttpHeaders.Referrer] } returns "http://abc/referrer"
 
-    every { hash.hint(String::class).invoke(any()) } answers { firstArg<String>().reversed() }
+    every { hash(any()) } answers { firstArg<String>().reversed() }
 }
 
 
@@ -88,7 +87,6 @@ fun mockUser(dao: ThinkterStorage, pwdHash: String? = null): User {
 fun ApplicationCall.mockPutSession() {
     every {
         attributes
-                .hint(SessionConfig::class)
                 .get(sessionConfigMatcher())
                 .sessionType
     } returns Session::class

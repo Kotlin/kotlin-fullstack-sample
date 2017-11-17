@@ -36,14 +36,14 @@ class ThinkterDatabaseTest {
         val row = mockk<ResultRow>()
         every {
             with(tx()) {
-                any<QueryStatement>().hint(Response::class).execute()
+                any<QueryStatement>().execute()
             }
         } returns response
 
         mockSingleRowResponse(response, row)
 
         every {
-            row.hint(Int::class).get<Int>(0)
+            row.get<Int>(0)
         } returns 3
 
         val nReplies = database.countReplies(1)
@@ -54,7 +54,7 @@ class ThinkterDatabaseTest {
                 assert<QueryStatement> {
                     "SELECT COUNT(Thoughts.id), Thoughts.reply_to = ? FROM Thoughts" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -63,7 +63,7 @@ class ThinkterDatabaseTest {
     fun createThought() {
         every {
             with(tx()) {
-                any<InsertValuesStatement<Thoughts, Int>>().hint(Int::class).execute()
+                any<InsertValuesStatement<Thoughts, Int>>().execute()
             }
         } returns 1
 
@@ -74,7 +74,7 @@ class ThinkterDatabaseTest {
                 assert<InsertValuesStatement<Thoughts, Int>> {
                     "INSERT INTO Thoughts (user_id, \"date\", reply_to, text) VALUES (?, ?, NULL, ?)" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Int::class).execute()
+                }.execute()
             }
         }
     }
@@ -83,7 +83,7 @@ class ThinkterDatabaseTest {
     fun deleteThought() {
         every {
             with(tx()) {
-                any<DeleteQueryStatement<Thoughts>>().hint(Int::class).execute()
+                any<DeleteQueryStatement<Thoughts>>().execute()
             }
         } just Runs
 
@@ -94,7 +94,7 @@ class ThinkterDatabaseTest {
                 assert<DeleteQueryStatement<Thoughts>> {
                     "DELETE FROM Thoughts  WHERE Thoughts.id = ?" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -105,21 +105,21 @@ class ThinkterDatabaseTest {
         val row = mockk<ResultRow>()
         every {
             with(tx()) {
-                any<QueryStatement>().hint(Response::class).execute()
+                any<QueryStatement>().execute()
             }
         } returns response
 
         mockSingleRowResponse(response, row)
 
 
-        every { row.hint(String::class)[Thoughts.user] } returns "user"
-        every { row.hint(String::class)[Thoughts.text] } returns "text"
+        every { row[Thoughts.user] } returns "user"
+        every { row[Thoughts.text] } returns "text"
 
         every {
-            row.hint(LocalDateTime::class)[Thoughts.date]
+            row[Thoughts.date]
         } returns LocalDateTime.now()
 
-        every { row.hint(Int::class)[Thoughts.replyTo] } returns null
+        every { row[Thoughts.replyTo] } returns null
 
         database.getThought(1)
 
@@ -128,7 +128,7 @@ class ThinkterDatabaseTest {
                 assert<QueryStatement> {
                     "SELECT * FROM Thoughts WHERE Thoughts.id = ?" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -139,13 +139,13 @@ class ThinkterDatabaseTest {
         val row = mockk<ResultRow>()
         every {
             with(tx()) {
-                any<QueryStatement>().hint(Response::class).execute()
+                any<QueryStatement>().execute()
             }
         } returns response
 
         mockSingleRowResponse(response, row)
 
-        every { row.hint(Int::class)[Thoughts.id] } returns 1
+        every { row[Thoughts.id] } returns 1
 
         database.userThoughts("id")
 
@@ -154,7 +154,7 @@ class ThinkterDatabaseTest {
                 assert<QueryStatement> {
                     "SELECT Thoughts.id FROM Thoughts WHERE Thoughts.user_id = ? ORDER BY Thoughts.\"date\" DESC NULLS LAST LIMIT ?" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -165,16 +165,16 @@ class ThinkterDatabaseTest {
         val row = mockk<ResultRow>()
         every {
             with(tx()) {
-                any<QueryStatement>().hint(Response::class).execute()
+                any<QueryStatement>().execute()
             }
         } returns response
 
         mockSingleRowResponse(response, row)
 
 
-        every { row.hint(String::class)[Users.email] } returns "email"
-        every { row.hint(String::class)[Users.displayName] } returns "user"
-        every { row.hint(String::class)[Users.passwordHash] } returns "hash"
+        every { row[Users.email] } returns "email"
+        every { row[Users.displayName] } returns "user"
+        every { row[Users.passwordHash] } returns "hash"
 
         database.user("user", "hash")
 
@@ -183,7 +183,7 @@ class ThinkterDatabaseTest {
                 assert<QueryStatement> {
                     "SELECT * FROM Users WHERE Users.id = ?" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -194,17 +194,17 @@ class ThinkterDatabaseTest {
         val row = mockk<ResultRow>()
         every {
             with(tx()) {
-                any<QueryStatement>().hint(Response::class).execute()
+                any<QueryStatement>().execute()
             }
         } returns response
 
         mockSingleRowResponse(response, row)
 
 
-        every { row.hint(String::class)[Users.id] } returns "user"
-        every { row.hint(String::class)[Users.email] } returns "email"
-        every { row.hint(String::class)[Users.displayName] } returns "user"
-        every { row.hint(String::class)[Users.passwordHash] } returns "hash"
+        every { row[Users.id] } returns "user"
+        every { row[Users.email] } returns "email"
+        every { row[Users.displayName] } returns "user"
+        every { row[Users.passwordHash] } returns "hash"
 
         database.userByEmail("email")
 
@@ -213,7 +213,7 @@ class ThinkterDatabaseTest {
                 assert<QueryStatement> {
                     "SELECT * FROM Users WHERE Users.email = ?" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -222,18 +222,18 @@ class ThinkterDatabaseTest {
     fun createUser() {
         every {
             with(tx()) {
-                any<InsertValuesStatement<Users, Int>>().hint(Int::class).execute()
+                any<InsertValuesStatement<Users, Unit>>().execute()
             }
-        } returns 1
+        } just Runs
 
         database.createUser(User("id", "email", "name", "pwd"))
 
         verify {
             with(tx()) {
-                assert<InsertValuesStatement<Thoughts, Int>> {
+                assert<InsertValuesStatement<Thoughts, Unit>> {
                     "INSERT INTO Users (id, display_name, email, password_hash) VALUES (?, ?, ?, ?)" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Int::class).execute()
+                }.execute()
             }
         }
     }
@@ -244,14 +244,14 @@ class ThinkterDatabaseTest {
         val row = mockk<ResultRow>()
         every {
             with(tx()) {
-                any<QueryStatement>().hint(Response::class).execute()
+                any<QueryStatement>().execute()
             }
         } returns response
 
         mockSingleRowResponse(response, row)
 
         val k2 = Thoughts.alias("k2")
-        every { row.hint(Int::class)[Thoughts.id(k2)] } returns 1
+        every { row[Thoughts.id(k2)] } returns 1
 
         database.top()
 
@@ -260,7 +260,7 @@ class ThinkterDatabaseTest {
                 assert<QueryStatement> {
                     "SELECT Thoughts.id, COUNT(k2.id) FROM Thoughts LEFT OUTER JOIN Thoughts AS k2 ON Thoughts.id = k2.reply_to GROUP BY Thoughts.id ORDER BY COUNT(k2.id) DESC NULLS LAST LIMIT ?" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -271,13 +271,13 @@ class ThinkterDatabaseTest {
         val row = mockk<ResultRow>()
         every {
             with(tx()) {
-                any<QueryStatement>().hint(Response::class).execute()
+                any<QueryStatement>().execute()
             }
         } returns response
 
         mockSingleRowResponse(response, row)
 
-        every { row.hint(Int::class)[Thoughts.id] } returns 1
+        every { row[Thoughts.id] } returns 1
 
         database.latest(1)
 
@@ -286,7 +286,7 @@ class ThinkterDatabaseTest {
                 assert<QueryStatement> {
                     "SELECT Thoughts.id FROM Thoughts WHERE Thoughts.\"date\" > ? ORDER BY Thoughts.\"date\" DESC NULLS LAST LIMIT ?" ==
                             BaseSQLDialect("dialect").statementSQL(it).sql
-                }.hint(Response::class).execute()
+                }.execute()
             }
         }
     }
@@ -298,7 +298,7 @@ class ThinkterDatabaseTest {
         } returnsMany listOf(true, false)
 
         every {
-            response.iterator().hint(ResultRow::class).next()
+            response.iterator().next()
         } returnsMany listOf(row, null)
     }
 }

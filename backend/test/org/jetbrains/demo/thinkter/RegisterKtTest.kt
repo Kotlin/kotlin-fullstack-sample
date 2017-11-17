@@ -79,9 +79,7 @@ class RegisterKtTest {
             every {
                 application
                         .attributes
-                        .hint(Attributes::class)
                         .get(ApplicationFeature.registry)
-                        .hint(Locations::class)
                         .get(Locations.key)
                         .href(any())
             } returns "/redirect"

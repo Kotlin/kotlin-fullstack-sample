@@ -24,9 +24,7 @@ class RouteDslMock(val route: Route, val locations: Locations) {
             route
                     .application
                     .attributes
-                    .hint(Attributes::class)
                     .get(ApplicationFeature.registry)
-                    .hint(Locations::class)
                     .get(Locations.key)
         } returns locations
     }
@@ -70,14 +68,10 @@ fun RouteBlockSlot.invokeBlock(locations: Locations,
 
         every {
             val dataCls = data.javaClass.kotlin
-            locations.hint(dataCls)
-                    .resolve<Any>(dataCls, call)
+            locations.resolve<Any>(dataCls, call)
         } returns data
 
-        every {
-            ctx.hint(ApplicationCall::class)
-                    .subject
-        } returns call
+        every { ctx.subject } returns call
 
         call.block {
             runBlocking {
