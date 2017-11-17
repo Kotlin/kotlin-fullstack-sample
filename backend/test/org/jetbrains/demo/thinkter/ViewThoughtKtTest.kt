@@ -66,11 +66,11 @@ class ViewThoughtKtTest {
             mockGetThought(dao, 0)
             mockSessionReturningNothing()
 
-            coEvery<Unit> { respond(any<Any>()) } just Runs
+            coEvery { respond(any<Any>()) } just Runs
 
             handle()
 
-            coVerify<Unit> {
+            coVerify {
                 respond(assert<ViewThoughtResponse> {
                     it.thought.id == 1 &&
                             it.code == null

@@ -62,11 +62,11 @@ class UserPageKtTest {
         getUserThoughts.invokeBlock(locations, UserThoughts("abcdef")) { handle ->
             every { dao.user("abcdef") } returns null
 
-            coEvery<Unit> { respond(any<Any>()) } just Runs
+            coEvery { respond(any<Any>()) } just Runs
 
             handle()
 
-            coVerify<Unit> {
+            coVerify {
                 respond(HttpStatusCode.NotFound.description("User abcdef doesn't exist"))
             }
         }

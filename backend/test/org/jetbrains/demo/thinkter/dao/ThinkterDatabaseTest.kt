@@ -299,6 +299,6 @@ class ThinkterDatabaseTest {
 
         every {
             response.iterator().next()
-        } returnsMany listOf(row, null)
+        } returnsMany listOf(row)
     }
 }
