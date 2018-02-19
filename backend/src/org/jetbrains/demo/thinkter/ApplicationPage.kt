@@ -1,7 +1,7 @@
 package org.jetbrains.demo.thinkter
 
 import kotlinx.html.*
-import org.jetbrains.ktor.html.*
+import io.ktor.html.*
 
 class ApplicationPage : Template<HTML> {
     val caption = Placeholder<TITLE>()
@@ -45,7 +45,7 @@ class ApplicationPage : Template<HTML> {
                 }
             }
             div { id = "content" }
-            script(src = "frontend/frontend.bundle.js")
+            script(src = "frontend/frontend.bundle.js", block = {})
         }
     }
 }

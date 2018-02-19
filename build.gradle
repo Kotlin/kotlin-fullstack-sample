@@ -1,9 +1,9 @@
 group = 'org.jetbrains.demo.thinkter'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 
 subprojects { p ->
     p.buildscript {
-        ext.kotlin_version = "1.1.51"
+        ext.kotlin_version = "1.2.21"
 
         repositories {
             mavenLocal()
@@ -13,16 +13,16 @@ subprojects { p ->
         
         dependencies {
             classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-            classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.23"
+            classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.27"
         }
     }
 }
 
 subprojects {
-    ext.kotlin_version = "1.1.51"
-    ext.html_version = "0.6.6"
-    ext.ktor_version = "0.3.0"
-    ext.squash_version = "0.2.2"
+    ext.kotlin_version = "1.2.21"
+    ext.html_version = "0.6.7"
+    ext.ktor_version = "0.9.1"
+    ext.squash_version = "0.2.4"
 
     repositories {
         mavenLocal()

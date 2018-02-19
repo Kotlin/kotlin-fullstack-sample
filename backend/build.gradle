@@ -5,21 +5,19 @@ apply plugin: 'kotlin'
 apply plugin: 'application'
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    compile "org.jetbrains.ktor:ktor-locations:$ktor_version"
-    compile "org.jetbrains.ktor:ktor-html-builder:$ktor_version"
+    compile "io.ktor:ktor-locations:$ktor_version"
+    compile "io.ktor:ktor-html-builder:$ktor_version"
+    compile "io.ktor:ktor-gson:$ktor_version"
     compile "org.ehcache:ehcache:3.0.0.m4"
 
     compile "org.jetbrains.squash:squash-h2:$squash_version"
 
-    testCompile("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-    testCompile "org.jetbrains.ktor:ktor-test-host:$ktor_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
     testCompile "org.jsoup:jsoup:1.9.1"
-
-    compile "org.jetbrains.ktor:ktor-jetty:$ktor_version"
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
 }
 
 sourceSets {
@@ -41,4 +39,4 @@ kotlin {
     }
 }
 
-mainClassName = 'org.jetbrains.ktor.jetty.DevelopmentHost'
+mainClassName = 'io.ktor.server.jetty.DevelopmentEngine'
