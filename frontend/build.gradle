@@ -2,7 +2,7 @@ group = 'org.jetbrains.elemental'
 version = '0.0.1-SNAPSHOT'
 
 apply plugin: 'kotlin2js'
-apply plugin: 'kotlin-dce-js'
+//apply plugin: 'kotlin-dce-js'
 apply plugin: 'org.jetbrains.kotlin.frontend'
 
 repositories {
@@ -37,18 +37,34 @@ kotlinFrontend {
         devDependency("babel-loader")
         devDependency("babel-core")
         devDependency("karma")
+        devDependency "karma-qunit", "1.2.1"
+
+        devDependency("enzyme")
+        devDependency("enzyme-adapter-react-16")
     }
 
     webpackBundle {
         publicPath = "/frontend/"
         port = 8080
         proxyUrl = "http://localhost:9090"
+
+        mode = "development"
+    }
+
+    karma {
+        enableWebPack = true
     }
 }
 
 compileKotlin2Js {
     kotlinOptions.metaInfo = true
-    kotlinOptions.outputFile = "$project.buildDir.path/js/${project.name}.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.main = "noCall"
+}
+
+compileTestKotlin2Js {
+    kotlinOptions.metaInfo = true
     kotlinOptions.sourceMap = true
     kotlinOptions.moduleKind = 'commonjs'
     kotlinOptions.main = "call"
@@ -58,7 +74,7 @@ sourceSets {
     main {
         kotlin.srcDirs += "src"
         resources.srcDirs += "resources"
-        output.resourcesDir = "build/js/resources"
+        output.resourcesDir = "build/classes/resources"
     }
     test {
         kotlin.srcDirs += "test"
