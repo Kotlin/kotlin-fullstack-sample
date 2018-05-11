@@ -3,7 +3,7 @@ version = '0.0.1-SNAPSHOT'
 
 subprojects { p ->
     p.buildscript {
-        ext.kotlin_version = "1.1.51"
+        ext.kotlin_version = "1.2.41"
 
         repositories {
             mavenLocal()
@@ -13,14 +13,14 @@ subprojects { p ->
         
         dependencies {
             classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-            classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.23"
+            classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.30"
         }
     }
 }
 
 subprojects {
-    ext.kotlin_version = "1.1.51"
-    ext.html_version = "0.6.6"
+    ext.kotlin_version = "1.2.41"
+    ext.html_version = "0.6.10"
     ext.ktor_version = "0.3.0"
     ext.squash_version = "0.2.2"
 

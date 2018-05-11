@@ -69,6 +69,10 @@ class ReactDOMBuilder : ReactBuilder(), TagConsumer<ReactElement?> {
         children.add(entity.text)
     }
 
+    override fun onTagComment(content: CharSequence): Unit {
+        // TODO implement comment generation if possible in react
+    }
+
     override fun onTagContentUnsafe(block: Unsafe.() -> Unit) {
         val sb = StringBuilder()
         object : Unsafe {
