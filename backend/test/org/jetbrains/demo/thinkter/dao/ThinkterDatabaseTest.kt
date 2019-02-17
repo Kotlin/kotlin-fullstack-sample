@@ -1,7 +1,6 @@
 package org.jetbrains.demo.thinkter.dao
 
 import io.mockk.*
-import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.model.User
 import org.jetbrains.squash.connection.DatabaseConnection
 import org.jetbrains.squash.dialect.BaseSQLDialect
@@ -14,9 +13,7 @@ import org.jetbrains.squash.statements.DeleteQueryStatement
 import org.jetbrains.squash.statements.InsertValuesStatement
 import org.jetbrains.squash.statements.QueryStatement
 import org.junit.Assert
-import org.junit.Ignore
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.time.LocalDateTime
 
 class ThinkterDatabaseTest {

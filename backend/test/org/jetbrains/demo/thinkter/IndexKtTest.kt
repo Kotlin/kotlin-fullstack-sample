@@ -1,7 +1,6 @@
 package org.jetbrains.demo.thinkter
 
 import io.mockk.*
-import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.IndexResponse
 import org.jetbrains.demo.thinkter.model.PollResponse
@@ -15,7 +14,6 @@ import org.jetbrains.ktor.routing.HttpMethodRouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.nio.charset.Charset
 
 class IndexKtTest {

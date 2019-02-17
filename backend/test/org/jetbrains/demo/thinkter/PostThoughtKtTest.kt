@@ -1,19 +1,15 @@
 package org.jetbrains.demo.thinkter
 
 import io.mockk.*
-import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.PostThoughtResult
 import org.jetbrains.demo.thinkter.model.PostThoughtToken
-import org.jetbrains.demo.thinkter.model.Thought
 import org.jetbrains.ktor.http.HttpMethod
 import org.jetbrains.ktor.locations.Locations
 import org.jetbrains.ktor.routing.HttpMethodRouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
-import org.junit.runner.RunWith
 
 class PostThoughtKtTest {
     val route = mockk<Routing>()

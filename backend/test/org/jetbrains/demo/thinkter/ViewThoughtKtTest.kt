@@ -1,10 +1,6 @@
 package org.jetbrains.demo.thinkter
 
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.junit.MockKJUnit4Runner
-import io.mockk.mockk
+import io.mockk.*
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.ViewThoughtResponse
 import org.jetbrains.ktor.http.HttpMethod
@@ -13,7 +9,6 @@ import org.jetbrains.ktor.routing.HttpMethodRouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 
 class ViewThoughtKtTest {
     val route = mockk<Routing>()

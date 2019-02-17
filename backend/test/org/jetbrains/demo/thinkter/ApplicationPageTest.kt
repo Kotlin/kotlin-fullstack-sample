@@ -1,9 +1,6 @@
 package org.jetbrains.demo.thinkter
 
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.cio.ByteBufferWriteChannel

@@ -11,7 +11,6 @@ import org.jetbrains.ktor.routing.Route
 import org.jetbrains.ktor.routing.RouteSelector
 import org.jetbrains.ktor.routing.Routing
 import org.jetbrains.ktor.routing.application
-import org.jetbrains.ktor.util.Attributes
 import kotlin.reflect.KClass
 
 fun Route.mockDsl(locations: Locations, block: RouteDslMock.() -> Unit) = RouteDslMock(this, locations).block()

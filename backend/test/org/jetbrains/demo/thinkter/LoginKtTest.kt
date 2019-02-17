@@ -1,20 +1,16 @@
 package org.jetbrains.demo.thinkter
 
 import io.mockk.*
-import io.mockk.junit.MockKJUnit4Runner
 import org.jetbrains.demo.thinkter.dao.ThinkterStorage
 import org.jetbrains.demo.thinkter.model.LoginResponse
 import org.jetbrains.demo.thinkter.model.User
-import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.http.HttpMethod
 import org.jetbrains.ktor.http.HttpStatusCode
 import org.jetbrains.ktor.locations.Locations
 import org.jetbrains.ktor.routing.HttpMethodRouteSelector
 import org.jetbrains.ktor.routing.Routing
-import org.jetbrains.ktor.sessions.SessionConfig
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 
 class LoginKtTest {
     val route = mockk<Routing>()
