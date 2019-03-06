@@ -6,8 +6,8 @@ front-end uses React. The example implements a very simple microblogging applica
 ## Backend
 
 The backend of Thinkter is built using [Ktor](https://github.com/kotlin/ktor), a Web framework built by the Kotlin team.
-For data persistence, it uses [H2](http://www.h2database.com), allowing you to run the example without the need to configure
-an external SQL server. The HTTP server implementation is provided by [Jetty](http://www.eclipse.org/jetty/).
+For data persistence, it uses [H2](https://www.h2database.com), allowing you to run the example without the need to configure
+an external SQL server. The HTTP server implementation is provided by [Jetty](https://www.eclipse.org/jetty/).
 
 To run the backend, use `./gradlew backend:run`, or open Thinkter as a project in IntelliJ IDEA and execute the shared 
 run configuration `Backend :: Jetty`. This will start serving the REST API of the backend on port 9090.

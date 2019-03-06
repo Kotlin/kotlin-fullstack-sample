@@ -8,7 +8,7 @@ subprojects { p ->
         repositories {
             mavenLocal()
             jcenter()
-            maven { url "http://dl.bintray.com/kotlin/kotlin-eap" }
+            maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
         }
         
         dependencies {
@@ -27,8 +27,8 @@ subprojects {
     repositories {
         mavenLocal()
         jcenter()
-        maven { url "http://dl.bintray.com/kotlin/kotlinx.html" }
-        maven { url "http://dl.bintray.com/kotlin/ktor" }
+        maven { url "https://dl.bintray.com/kotlin/kotlinx.html" }
+        maven { url "https://dl.bintray.com/kotlin/ktor" }
         maven { url "https://dl.bintray.com/kotlin/squash" }
     }
 }
