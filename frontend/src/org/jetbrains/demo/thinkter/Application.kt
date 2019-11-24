@@ -1,12 +1,22 @@
 package org.jetbrains.demo.thinkter
 
-import kotlinx.html.*
-import kotlinx.html.js.*
-import org.jetbrains.demo.thinkter.model.*
-import react.*
-import react.dom.*
-import kotlin.browser.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.html.div
+import kotlinx.html.h1
+import kotlinx.html.js.onClickFunction
+import kotlinx.html.nav
+import org.jetbrains.demo.thinkter.model.Thought
+import org.jetbrains.demo.thinkter.model.User
+import react.RProps
+import react.RState
+import react.ReactComponentNoProps
+import react.ReactComponentSpec
+import react.dom.ReactDOM
+import react.dom.ReactDOMBuilder
+import react.dom.ReactDOMComponent
+import react.dom.render
+import kotlin.browser.document
 
 fun main(args: Array<String>) {
     runtime.wrappers.require("pure-blog.css")
@@ -20,6 +30,7 @@ fun main(args: Array<String>) {
 
 class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageState>() {
     companion object : ReactComponentSpec<Application, ReactComponentNoProps, ApplicationPageState>
+
     val polling = Polling()
 
     init {
@@ -135,10 +146,10 @@ class Application : ReactDOMComponent<ReactComponentNoProps, ApplicationPageStat
     }
 
     private fun checkUserSession() {
-        async {
+        GlobalScope.async {
             val user = checkSession()
             onUserAssigned(user)
-        }.catch {
+        }.runCatching {
             setState {
                 selected = MainView.Home
             }

@@ -1,11 +1,12 @@
 package org.jetbrains.demo.thinkter
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.html.*
 import kotlinx.html.js.*
 import org.jetbrains.demo.thinkter.model.*
 import react.*
 import react.dom.*
-import kotlinx.coroutines.experimental.launch
 
 class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, NavBarComponent.NavBarState>() {
 
@@ -85,7 +86,7 @@ class NavBarComponent : ReactDOMComponent<NavBarComponent.NavBarHandlerProps, Na
     }
 
     private fun logout() {
-        launch {
+        GlobalScope.launch {
             logoutUser()
             props.logoutHandler()
         }

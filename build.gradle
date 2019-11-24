@@ -1,6 +1,19 @@
 group = 'org.jetbrains.demo.thinkter'
 version = '0.0.1-SNAPSHOT'
 
+ext {
+    kotlin_version = "1.3.50"
+    html_version = "0.6.12"
+    ktor_version = "1.2.5"
+    kotlin_coroutines_version = "1.3.2"
+    kotlin_frontend_version = "0.0.45"
+    squash_version = "0.2.2"
+    appengine_version = '1.9.60'
+    appengine_plugin_version = '1.3.4'
+    gce_logback_version = '0.60.0-alpha'
+}
+
+
 subprojects { p ->
     p.buildscript {
         ext.kotlin_version = "1.1.51"
@@ -12,17 +25,24 @@ subprojects { p ->
         }
         
         dependencies {
-            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-            classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.23"
+            classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+            classpath("org.jetbrains.kotlin:kotlin-frontend-plugin:$kotlin_frontend_version")
         }
     }
 }
 
 subprojects {
-    ext.kotlin_version = "1.1.51"
-    ext.html_version = "0.6.6"
-    ext.ktor_version = "0.3.0"
-    ext.squash_version = "0.2.2"
+    ext {
+        kotlin_version = "$kotlin_version"
+        html_version = "$html_version"
+        ktor_version = "$ktor_version"
+        kotlin_coroutines_version = "$kotlin_coroutines_version"
+        kotlin_frontend_version = "$kotlin_frontend_version"
+        squash_version = "$squash_version"
+        appengine_version = "$appengine_version"
+        appengine_plugin_version = "$appengine_plugin_version"
+        gce_logback_version = "$gce_logback_version"
+    }
 
     repositories {
         mavenLocal()

@@ -1,13 +1,16 @@
 package org.jetbrains.demo.thinkter
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.html.*
-import kotlinx.html.js.*
-import org.jetbrains.common.*
-import org.jetbrains.demo.thinkter.model.*
-import react.*
-import react.dom.*
-import kotlin.browser.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.html.js.onChangeFunction
+import kotlinx.html.js.onClickFunction
+import org.jetbrains.common.inputValue
+import org.jetbrains.demo.thinkter.model.User
+import react.RState
+import react.ReactComponentSpec
+import react.dom.ReactDOMBuilder
+import react.dom.ReactDOMComponent
 
 
 class RegisterComponent : ReactDOMComponent<UserProps, RegisterFormState>() {
@@ -73,7 +76,7 @@ class RegisterComponent : ReactDOMComponent<UserProps, RegisterFormState>() {
 
                 state.errorMessage?.takeIf(String::isNotEmpty)?.let { message ->
                     label {
-                        + message
+                        +message
                     }
                 }
 
@@ -94,12 +97,16 @@ class RegisterComponent : ReactDOMComponent<UserProps, RegisterFormState>() {
         setState {
             disabled = true
         }
-        async {
-            with(state) {
-                val user = register(login, password, displayName, email)
-                registered(user)
+        try {
+            GlobalScope.async {
+                with(state) {
+                    val user = register(login, password, displayName, email)
+                    registered(user)
+                }
             }
-        }.catch { err -> registrationFailed(err) }
+        } catch (err: Exception) {
+            registrationFailed(err)
+        }
     }
 
     private fun registered(user: User) {

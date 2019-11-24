@@ -84,10 +84,6 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 
     abstract fun render(): ReactElement?
 
-    open fun componentWillMount() {
-
-    }
-
     open fun componentDidMount() {
 
     }
@@ -102,14 +98,6 @@ abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 
     open fun shouldComponentUpdate(nextProps: P, nextState: S): Boolean {
         return true
-    }
-
-    open fun componentWillUpdate() {
-
-    }
-
-    open fun componentWillReceiveProps(nextProps: P) {
-
     }
 
     override fun subscribe(listener: ReactComponentLifecycleListener) {
@@ -174,19 +162,6 @@ class ReactComponentWrapper<K, P : RProps, S : RState>(var props: P, val updater
         return delegate.shouldComponentUpdate(nextProps, nextState)
     }
 
-    @JsName("componentWillReceiveProps")
-    fun componentWillReceiveProps(nextProps: P) {
-        delegate.componentWillReceiveProps(nextProps)
-    }
-
-    @JsName("componentWillUpdate")
-    fun componentWillUpdate() {
-        subscribers.forEach {
-            it.reactComponentWillUpdate()
-        }
-        delegate.componentWillUpdate()
-    }
-
     @JsName("componentDidUpdate")
     fun componentDidUpdate(prevProps: P, prevState: S) {
         subscribers.forEach {
@@ -201,14 +176,6 @@ class ReactComponentWrapper<K, P : RProps, S : RState>(var props: P, val updater
             it.reactComponentWillUnmount()
         }
         delegate.componentWillUnmount()
-    }
-
-    @JsName("componentWillMount")
-    fun componentWillMount() {
-        subscribers.forEach {
-            it.reactComponentWillMount()
-        }
-        delegate.componentWillMount()
     }
 
     @JsName("componentDidMount")

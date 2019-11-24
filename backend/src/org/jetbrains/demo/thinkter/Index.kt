@@ -1,31 +1,41 @@
 package org.jetbrains.demo.thinkter
 
-import org.jetbrains.demo.thinkter.dao.*
-import org.jetbrains.demo.thinkter.model.*
-import org.jetbrains.ktor.application.*
-import org.jetbrains.ktor.html.*
-import org.jetbrains.ktor.http.*
-import org.jetbrains.ktor.locations.*
-import org.jetbrains.ktor.response.*
-import org.jetbrains.ktor.routing.*
-import org.jetbrains.ktor.sessions.*
-import java.time.*
+import io.ktor.application.call
+import io.ktor.html.respondHtmlTemplate
+import io.ktor.http.ContentType
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.get
+import io.ktor.response.ApplicationSendPipeline
+import io.ktor.response.etag
+import io.ktor.response.respond
+import io.ktor.routing.Route
+import io.ktor.routing.accept
+import io.ktor.routing.get
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
+import org.jetbrains.demo.thinkter.dao.ThinkterStorage
+import org.jetbrains.demo.thinkter.model.IndexResponse
+import org.jetbrains.demo.thinkter.model.PollResponse
+import org.jetbrains.demo.thinkter.model.Thought
+import java.time.LocalDateTime
+import java.time.ZoneId
 
+@KtorExperimentalLocationsAPI
 fun Route.index(storage: ThinkterStorage) {
-    contentType(ContentType.Text.Html) {
-        get<Index> {
+    accept(ContentType.Text.Html) {
+        get {
             call.respondHtmlTemplate(ApplicationPage()) {
                 caption { +"Thinkter" }
             }
         }
     }
-    contentType(ContentType.Application.Json) {
+    accept(ContentType.Application.Json) {
         get<Index> {
-            val user = call.sessionOrNull<Session>()?.let { storage.user(it.userId) }
+            val user = call.sessions.get<Session>()?.let { storage.user(it.userId) }
             val top = storage.top(10).map(storage::getThought)
             val latest = storage.latest(10).map(storage::getThought)
 
-            call.response.pipeline.intercept(ApplicationResponsePipeline.After) {
+            call.response.pipeline.intercept(ApplicationSendPipeline.After) {
                 val etagString = user?.userId + "," + top.joinToString { it.id.toString() } + latest.joinToString { it.id.toString() }
                 call.response.etag(etagString)
             }

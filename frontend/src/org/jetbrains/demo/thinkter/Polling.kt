@@ -1,8 +1,9 @@
 package org.jetbrains.demo.thinkter
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlin.browser.*
 import kotlin.js.*
-import kotlinx.coroutines.experimental.launch
 
 class Polling(val period: Int = 20000) {
     private var timerId = 0
@@ -27,7 +28,7 @@ class Polling(val period: Int = 20000) {
     }
 
     fun tick() {
-        launch {
+        GlobalScope.launch {
             val newMessagesText = pollFromLastTime(lastTime.toString())
             val newMessages = when {
                 newMessagesText == "0" || newMessagesText.isBlank() -> NewMessages.None

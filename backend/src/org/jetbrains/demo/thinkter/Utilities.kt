@@ -1,17 +1,21 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package org.jetbrains.demo.thinkter
 
-import org.jetbrains.demo.thinkter.dao.*
-import org.jetbrains.demo.thinkter.model.*
-import org.jetbrains.ktor.application.*
-import org.jetbrains.ktor.http.*
-import org.jetbrains.ktor.locations.*
-import org.jetbrains.ktor.request.*
-import org.jetbrains.ktor.response.*
-import org.jetbrains.ktor.util.*
-import java.net.*
-import java.util.concurrent.*
-import javax.crypto.*
-import javax.crypto.spec.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.feature
+import io.ktor.http.HttpHeaders
+import io.ktor.locations.Locations
+import io.ktor.request.header
+import io.ktor.request.host
+import io.ktor.request.port
+import io.ktor.response.respondRedirect
+import io.ktor.util.hex
+import org.jetbrains.demo.thinkter.model.User
+import java.net.URI
+import java.util.concurrent.TimeUnit
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 val hashKey = hex("6819b57a326945c1968f45236589")
 val hmacKey = SecretKeySpec(hashKey, "HmacSHA1")
@@ -24,7 +28,7 @@ fun hash(password: String): String {
 fun ApplicationCall.refererHost() = request.header(HttpHeaders.Referrer)?.let { URI.create(it).host }
 
 suspend fun ApplicationCall.redirect(location: Any) {
-    val host = request.host() ?: "localhost"
+    val host = request.host()
     val portSpec = request.port().let { if (it == 80) "" else ":$it" }
     val address = host + portSpec
 

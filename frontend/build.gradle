@@ -5,13 +5,11 @@ apply plugin: 'kotlin2js'
 apply plugin: 'kotlin-dce-js'
 apply plugin: 'org.jetbrains.kotlin.frontend'
 
-repositories {
-    jcenter()
-}
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
+    compile("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version")
+//    compile("org.jetbrains.kotlin:kotlin-test-js:$kotlin_version")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$kotlin_coroutines_version")
     compile("org.jetbrains.kotlinx:kotlinx-html-js:$html_version")
 }
 
@@ -22,9 +20,9 @@ kotlinFrontend {
     sourceMaps = false
 
     npm {
-        replaceVersion("kotlinx-html-js", "1.1.0")
-        replaceVersion("kotlinx-html-shared", "1.1.0")
-        replaceVersion("kotlin-js-library", "1.1.0")
+        replaceVersion("kotlinx-html-js", "$html_version")
+        replaceVersion("kotlinx-html-shared", "$html_version")
+        replaceVersion("kotlin-js-library", "$kotlin_version")
 
         dependency("react")
         dependency("react-dom")
@@ -35,7 +33,7 @@ kotlinFrontend {
         devDependency("css-loader")
         devDependency("style-loader")
         devDependency("babel-loader")
-        devDependency("babel-core")
+        devDependency("@babel/core")
         devDependency("karma")
     }
 
@@ -63,11 +61,5 @@ sourceSets {
     test {
         kotlin.srcDirs += "test"
         resources.srcDirs += "testResources"
-    }
-}
-
-kotlin {
-    experimental {
-        coroutines "enable"
     }
 }
