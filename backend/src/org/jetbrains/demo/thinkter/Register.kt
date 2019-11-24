@@ -33,7 +33,7 @@ fun Route.register(dao: ThinkterStorage, hashFunction: (String) -> String) {
                     error = parameters["error"] ?: ""
             )
             if (form.password.length < 6) {
-                call.respond(LoginResponse(error = "Password should be at least 6 characters long ${form.password.length}"))
+                call.respond(LoginResponse(error = "Password should be at least 6 characters long"))
             } else if (form.userId.length < 4) {
                 call.respond(LoginResponse(error = "Login should be at least 4 characters long"))
             } else if (!userNameValid(form.userId)) {
