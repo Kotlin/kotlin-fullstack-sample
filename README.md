@@ -1,3 +1,8 @@
+# Warning
+
+This sample uses plugins, which will be deprecated.
+There is a [new repository](https://github.com/Kotlin/kotlin-full-stack-application-demo) with actual Kotlin version and Kotlin/JS Gradle plugin.
+
 # Thinkter: A Kotlin Full-stack Application Example
 
 Thinkter is an example of a full-stack Web application built with Kotlin. The backend runs on the JVM, and the browser
