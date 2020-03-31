@@ -11,8 +11,6 @@ import org.jetbrains.ktor.util.*
 
 fun Route.register(dao: ThinkterStorage, hashFunction: (String) -> String) {
     post<Register> { form ->
-        val vm = call.request.content.get<ValuesMap>()
-
         val user = call.sessionOrNull<Session>()?.let { dao.user(it.userId) }
         if (user != null) {
             call.redirect(LoginResponse(user))
@@ -40,6 +38,7 @@ fun Route.register(dao: ThinkterStorage, hashFunction: (String) -> String) {
                         application.environment.log.error("Failed to register user", e)
                         call.respond(LoginResponse(error = "Failed to register"))
                     }
+                    return@post
                 }
 
                 call.session(Session(newUser.userId))
