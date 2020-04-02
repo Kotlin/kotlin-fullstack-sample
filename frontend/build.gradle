@@ -35,7 +35,7 @@ kotlinFrontend {
         devDependency("css-loader")
         devDependency("style-loader")
         devDependency("babel-loader")
-        devDependency("babel-core")
+        devDependency("@babel/core")
         devDependency("karma")
     }
 
