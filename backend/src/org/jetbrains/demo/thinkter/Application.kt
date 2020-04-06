@@ -1,41 +1,48 @@
 package org.jetbrains.demo.thinkter
 
-import com.google.gson.*
-import org.jetbrains.demo.thinkter.dao.*
-import org.jetbrains.demo.thinkter.model.*
-import org.jetbrains.ktor.application.*
-import org.jetbrains.ktor.content.*
-import org.jetbrains.ktor.features.*
-import org.jetbrains.ktor.http.*
-import org.jetbrains.ktor.locations.*
-import org.jetbrains.ktor.logging.*
-import org.jetbrains.ktor.routing.*
-import org.jetbrains.ktor.sessions.*
-import org.jetbrains.ktor.transform.*
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.features.*
+import io.ktor.gson.gson
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Locations
+import io.ktor.response.respond
+import io.ktor.routing.routing
+import io.ktor.sessions.SessionTransportTransformerMessageAuthentication
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
+import org.jetbrains.demo.thinkter.dao.ThinkterDatabase
+
+const val SESSION_NAME: String = "SESSION_NAME"
 
 data class Session(val userId: String)
 
+@KtorExperimentalLocationsAPI
 fun Application.main() {
     val storage = ThinkterDatabase(/*JDBCConnection.Companion.create(H2Dialect, pool)*/)
 
     install(DefaultHeaders)
     install(CallLogging)
     install(ConditionalHeaders)
-    install(PartialContentSupport)
+    install(PartialContent)
     install(Compression)
     install(Locations)
     install(StatusPages) {
-        exception<NotImplementedError> { call.respond(HttpStatusCode.NotImplemented) }
+        exception<NotImplementedError> { call.respond(HttpStatusCode.NotImplemented, "${it.message}") }
     }
 
-    withSessions<Session> {
-        withCookieByValue {
-            settings = SessionCookiesSettings(transformers = listOf(SessionCookieTransformerMessageAuthentication(hashKey)))
+    install(Sessions) {
+        cookie<Session>(SESSION_NAME) {
+            transform(SessionTransportTransformerMessageAuthentication(hashKey))
         }
     }
 
-    transform.register<RpcData> {
-        TextContent(Gson().toJson(it), ContentType.Application.Json)
+    install(ContentNegotiation) {
+        gson {
+            setPrettyPrinting()
+        }
     }
 
     routing {

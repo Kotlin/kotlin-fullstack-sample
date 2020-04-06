@@ -1,6 +1,6 @@
 package org.jetbrains.demo.thinkter
 
-import kotlinx.coroutines.experimental.await
+import kotlinx.coroutines.await
 import org.jetbrains.demo.thinkter.model.*
 import org.w3c.dom.url.*
 import org.w3c.fetch.*

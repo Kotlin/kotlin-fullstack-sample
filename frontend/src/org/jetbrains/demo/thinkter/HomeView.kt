@@ -1,10 +1,17 @@
 package org.jetbrains.demo.thinkter
 
-import kotlinx.html.*
-import org.jetbrains.demo.thinkter.model.*
-import react.*
-import react.dom.*
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.html.div
+import kotlinx.html.h2
+import kotlinx.html.h3
+import kotlinx.html.p
+import org.jetbrains.demo.thinkter.model.Thought
+import react.RProps
+import react.RState
+import react.ReactComponentSpec
+import react.dom.ReactDOMBuilder
+import react.dom.ReactDOMComponent
 
 class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
     companion object : ReactComponentSpec<HomeView, Props, State>
@@ -13,8 +20,8 @@ class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
         state = State(emptyList(), emptyList(), true, Polling.NewMessages.None)
     }
 
-    override fun componentWillMount() {
-        super.componentWillMount()
+    override fun componentDidMount() {
+        super.componentDidMount()
 
         props.polling.listeners.add(pollerHandler)
         loadHome()
@@ -48,7 +55,7 @@ class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
     }
 
     private fun loadHome() {
-        launch {
+        GlobalScope.launch {
             val r = index()
             props.polling.start()
             setState {
@@ -59,7 +66,7 @@ class HomeView : ReactDOMComponent<HomeView.Props, HomeView.State>() {
         }
     }
 
-    private val pollerHandler = { m : Polling.NewMessages ->
+    private val pollerHandler = { m: Polling.NewMessages ->
         val oldMessages = state.newMessages
         setState {
             newMessages = m

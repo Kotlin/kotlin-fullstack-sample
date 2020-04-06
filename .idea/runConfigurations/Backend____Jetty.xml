@@ -2,7 +2,7 @@
   <configuration default="false" name="Backend :: Jetty" type="Application" factoryName="Application" singleton="true">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <extension name="org.jetbrains.fluid.java.FluidRunConfigurationExtension" fluid.enabledBundledTracers="false" fluid.enabledBundledTracers.list="" />
-    <option name="MAIN_CLASS_NAME" value="org.jetbrains.ktor.jetty.DevelopmentHost" />
+    <option name="MAIN_CLASS_NAME" value="io.ktor.server.jetty.EngineMain" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />

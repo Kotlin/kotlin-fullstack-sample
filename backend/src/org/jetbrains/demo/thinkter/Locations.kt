@@ -1,35 +1,37 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package org.jetbrains.demo.thinkter
 
-import org.jetbrains.ktor.locations.*
+import io.ktor.locations.Location
 
 
-@location("/")
-class Index()
+@Location("/")
+class Index
 
-@location("/poll")
+@Location("/poll")
 class Poll(val lastTime: String = "")
 
-@location("/post-new")
+@Location("/post-new")
 data class PostThought(val text: String = "", val date: Long = 0L, val code: String = "", val replyTo: Int? = null)
 
-@location("/thought/{id}/delete")
+@Location("/thought/{id}/delete")
 data class ThoughtDelete(val id: Int, val date: Long, val code: String)
 
-@location("/thought/{id}")
+@Location("/thought/{id}")
 data class ViewThought(val id: Int)
 
-@location("/user/{user}")
+@Location("/user/{user}")
 @Deprecated("")
 data class UserPage(val user: String)
 
-@location("/user/{user}/thoughts")
+@Location("/user/{user}/thoughts")
 data class UserThoughts(val user: String)
 
-@location("/register")
+@Location("/register")
 data class Register(val userId: String = "", val displayName: String = "", val email: String = "", val password: String = "", val error: String = "")
 
-@location("/login")
+@Location("/login")
 data class Login(val userId: String = "", val password: String = "", val error: String = "")
 
-@location("/logout")
-class Logout()
+@Location("/logout")
+class Logout

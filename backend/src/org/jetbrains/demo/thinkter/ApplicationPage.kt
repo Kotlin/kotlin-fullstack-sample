@@ -1,7 +1,9 @@
 package org.jetbrains.demo.thinkter
 
+import io.ktor.html.Placeholder
+import io.ktor.html.Template
+import io.ktor.html.insert
 import kotlinx.html.*
-import org.jetbrains.ktor.html.*
 
 class ApplicationPage : Template<HTML> {
     val caption = Placeholder<TITLE>()
@@ -21,8 +23,8 @@ class ApplicationPage : Template<HTML> {
             insert(head)
             link("https://fonts.googleapis.com/icon?family=Material+Icons", rel = "stylesheet")
 
-            link(rel = LinkRel.stylesheet, type=LinkType.textCss, href = "http://yui.yahooapis.com/pure/0.6.0/pure-min.css")
-            link(rel = LinkRel.stylesheet, type=LinkType.textCss, href = "http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css")
+            link(rel = LinkRel.stylesheet, type = LinkType.textCss, href = "http://yui.yahooapis.com/pure/0.6.0/pure-min.css")
+            link(rel = LinkRel.stylesheet, type = LinkType.textCss, href = "http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css")
 
         }
         body {
@@ -45,7 +47,7 @@ class ApplicationPage : Template<HTML> {
                 }
             }
             div { id = "content" }
-            script(src = "frontend/frontend.bundle.js")
+            script(src = "frontend/frontend.bundle.js", block = {})
         }
     }
 }

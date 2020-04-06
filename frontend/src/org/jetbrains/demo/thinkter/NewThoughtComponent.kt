@@ -1,12 +1,18 @@
 package org.jetbrains.demo.thinkter
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.html.*
-import kotlinx.html.js.*
-import org.jetbrains.common.*
-import org.jetbrains.demo.thinkter.model.*
-import react.*
-import react.dom.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.html.js.onChangeFunction
+import kotlinx.html.js.onClickFunction
+import org.jetbrains.common.inputValue
+import org.jetbrains.demo.thinkter.model.Thought
+import org.jetbrains.demo.thinkter.model.User
+import react.RProps
+import react.RState
+import react.ReactComponentSpec
+import react.dom.ReactDOMBuilder
+import react.dom.ReactDOMComponent
 
 class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThoughtComponent.State>() {
     companion object : ReactComponentSpec<NewThoughtComponent, Props, State>
@@ -27,7 +33,7 @@ class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThou
 
             props.replyTo?.let { replyTo ->
                 div {
-                    + "reply to ${replyTo.userId}"
+                    +"reply to ${replyTo.userId}"
                 }
             }
 
@@ -46,7 +52,7 @@ class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThou
             }
 
             button(classes = "pure-button pure-button-primary") {
-                + "Post"
+                +"Post"
 
                 onClickFunction = {
                     it.preventDefault()
@@ -57,11 +63,15 @@ class NewThoughtComponent : ReactDOMComponent<NewThoughtComponent.Props, NewThou
     }
 
     private fun doPostThought() {
-        async {
-            val token = postThoughtPrepare()
-            val thought = postThought(props.replyTo?.id, state.text, token)
-            onSubmitted(thought)
-        }.catch { err -> onFailed(err) }
+        try {
+            GlobalScope.async {
+                val token = postThoughtPrepare()
+                val thought = postThought(props.replyTo?.id, state.text, token)
+                onSubmitted(thought)
+            }
+        } catch (err: Exception) {
+            onFailed(err)
+        }
     }
 
     private fun onSubmitted(thought: Thought) {

@@ -1,14 +1,16 @@
 package react.dom
 
 import kotlinx.html.*
-import org.w3c.dom.events.*
-import react.*
+import org.w3c.dom.events.Event
+import react.RProps
+import react.ReactBuilder
+import react.ReactElement
 
-class InnerHTML (
-    val __html: String
+class InnerHTML(
+        val __html: String
 )
 
-class DOMProps: RProps() {
+class DOMProps : RProps() {
     var dangerouslySetInnerHTML: InnerHTML? = null
 }
 
@@ -29,7 +31,7 @@ class ReactDOMBuilder : ReactBuilder(), TagConsumer<ReactElement?> {
     }
 */
 
-    override fun <P: RProps> createReactNode(type: Any, props: P) = Node(type, props)
+    override fun <P : RProps> createReactNode(type: Any, props: P) = Node(type, props)
 
     class DOMNode(val tagName: String) : Node<DOMProps>(tagName, DOMProps())
 
@@ -93,6 +95,10 @@ class ReactDOMBuilder : ReactBuilder(), TagConsumer<ReactElement?> {
 
     override fun onTagEvent(tag: Tag, event: String, value: (Event) -> Unit) {
         setProp(event, value)
+    }
+
+    override fun onTagComment(content: CharSequence) {
+        // ignore
     }
 
     override fun finalize(): ReactElement? {
