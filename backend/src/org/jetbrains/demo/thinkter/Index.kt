@@ -2,30 +2,30 @@ package org.jetbrains.demo.thinkter
 
 import org.jetbrains.demo.thinkter.dao.*
 import org.jetbrains.demo.thinkter.model.*
-import org.jetbrains.ktor.application.*
-import org.jetbrains.ktor.html.*
-import org.jetbrains.ktor.http.*
-import org.jetbrains.ktor.locations.*
-import org.jetbrains.ktor.response.*
-import org.jetbrains.ktor.routing.*
-import org.jetbrains.ktor.sessions.*
+import io.ktor.application.*
+import io.ktor.html.*
+import io.ktor.http.*
+import io.ktor.locations.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.sessions.*
 import java.time.*
 
 fun Route.index(storage: ThinkterStorage) {
-    contentType(ContentType.Text.Html) {
+    accept(ContentType.Text.Html) {
         get<Index> {
             call.respondHtmlTemplate(ApplicationPage()) {
                 caption { +"Thinkter" }
             }
         }
     }
-    contentType(ContentType.Application.Json) {
+    accept(ContentType.Application.Json) {
         get<Index> {
-            val user = call.sessionOrNull<Session>()?.let { storage.user(it.userId) }
+            val user = call.sessions.get<Session>()?.let { storage.user(it.userId) }
             val top = storage.top(10).map(storage::getThought)
             val latest = storage.latest(10).map(storage::getThought)
 
-            call.response.pipeline.intercept(ApplicationResponsePipeline.After) {
+            call.response.pipeline.intercept(ApplicationSendPipeline.After) {
                 val etagString = user?.userId + "," + top.joinToString { it.id.toString() } + latest.joinToString { it.id.toString() }
                 call.response.etag(etagString)
             }

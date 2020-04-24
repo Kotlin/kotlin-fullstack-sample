@@ -1,13 +1,12 @@
 package org.jetbrains.demo.thinkter
 
-import org.jetbrains.demo.thinkter.dao.*
 import org.jetbrains.demo.thinkter.model.*
-import org.jetbrains.ktor.application.*
-import org.jetbrains.ktor.http.*
-import org.jetbrains.ktor.locations.*
-import org.jetbrains.ktor.request.*
-import org.jetbrains.ktor.response.*
-import org.jetbrains.ktor.util.*
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.locations.*
+import io.ktor.request.*
+import io.ktor.response.*
+import io.ktor.util.*
 import java.net.*
 import java.util.concurrent.*
 import javax.crypto.*
