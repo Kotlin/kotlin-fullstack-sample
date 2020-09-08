@@ -17,5 +17,5 @@ fun <T> async(block: suspend () -> T): Promise<T> = Promise<T> { resolve, reject
 }
 
 fun launch(block: suspend () -> Unit) {
-    async(block).catch { exception -> console.log("Failed with $exception") }
+    async(block).catch { exception -> console.error(exception) }
 }
